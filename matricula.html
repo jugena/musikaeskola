@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrícula 2026-27 | Erandioko Musika Eskola</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('img/matricula-preview.png');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.05;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .matricula-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4rem;
+            min-height: 60vh;
+            padding: 4rem 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .preview-container {
+            flex: 1;
+            max-width: 500px;
+            box-shadow: var(--shadow);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .preview-container:hover {
+            transform: scale(1.02);
+        }
+        
+        .preview-container img {
+            width: 100%;
+            display: block;
+        }
+        
+        .info-container {
+            flex: 1;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .btn-download {
+            display: inline-block;
+            padding: 1.2rem 2.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #ffffff;
+            color: #ffffff;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            transition: var(--transition);
+        }
+        
+        .btn-download:hover {
+            background: #ffffff;
+            color: #5eabdc;
+            transform: translateY(-5px);
+        }
+        
+        .headline {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+        }
+        
+        .subheadline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="img/logo-trans-zuria.png" alt="Erandioko Musika Eskola Logo">
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="asignaturas.html">Asignaturas</a>
+                <a href="profesorado.html">Profesorado</a>
+                <a href="ejercicios.html">Ejercicios</a>
+                <a href="calendario.html">Calendario</a>
+                <a href="matricula.html" class="active">Matrícula</a>
+                <a href="contacto.html">Contacto</a>
+                <div class="lang-selector">
+                    <a href="matricula.html" class="active">ES</a>
+                    <span>|</span>
+                    <a href="matricula-eu.html">EU</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="matricula-content">
+            <a href="https://www.erandio.eus/es-ES/Documents/MusikaEskola/2026/Aurrematrikula/aurre-matrikula_2026-27.html" class="preview-container" target="_blank">
+                <img src="img/matricula-preview.png" alt="Vista previa de la ficha de inscripción">
+            </a>
+            
+            <div class="info-container">
+                <h1 class="headline">INSKRIPZIO FITXA<br>FICHA DE INSCRIPCIÓN</h1>
+                <h2 style="margin-bottom: 3rem; opacity: 0.8;">CURSO 2026-27 IKASTURTEA</h2>
+                
+                <p class="subheadline">Descarga la ficha de inscripción, rellénala y entrégala en la secretaría del centro.</p>
+                
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+                    <a href="https://www.erandio.eus/es-ES/Documents/MusikaEskola/2026/Aurrematrikula/aurre-matrikula_2026-27.html" class="btn-download" target="_blank" style="margin-top: 0; flex: 1; min-width: 220px;">
+                        Descargar PDF
+                    </a>
+                    <a href="https://form.jotform.com/sareaerandio/inskripzio-fitxa_2026-27" class="btn-download" target="_blank" style="margin-top: 0; flex: 1; min-width: 220px; background: white; color: #5eabdc;">
+                        Formulario Online
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p class="copyright">&copy; 2026 Erandioko Musika Eskola</p>
+    </header>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

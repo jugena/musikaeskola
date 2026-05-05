@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erandioko Musika Eskola | Inicio</title>
+    <meta name="description" content="Bienvenid@ a la Escuela de Música de Erandio. Tu punto de encuentro para el aprendizaje musical, instrumentos y cultura.">
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('img/kalekokantak.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.05; /* 95% transparencia */
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="img/logo-trans-zuria.png" alt="Erandioko Musika Eskola Logo">
+            </a>
+            <nav class="nav-links">
+                <a href="index.html" class="active">Inicio</a>
+                <a href="asignaturas.html">Asignaturas</a>
+                <a href="profesorado.html">Profesorado</a>
+                <a href="ejercicios.html">Ejercicios</a>
+                <a href="calendario.html">Calendario</a>
+                <a href="matricula.html">Matrícula</a>
+                <a href="contacto.html">Contacto</a>
+                <div class="lang-selector">
+                    <a href="index.html" class="active">ES</a>
+                    <span>|</span>
+                    <a href="index-eu.html">EU</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="hero">
+        <video autoplay muted loop playsinline class="video-bg">
+            <source src="img/MusikaEskolaSoinurikEZ.mp4" type="video/mp4">
+        </video>
+        <div class="hero-overlay"></div>
+        <h1>Bienvenid@ a Erandioko Musika Eskola</h1>
+        <p>Tu punto de encuentro para la formación musical, la cultura y el arte en Erandio.</p>
+    </div>
+
+    <main>
+        <section>
+            <h2>Últimas Noticias</h2>
+            <div id="news-grid-dynamic" class="news-grid">
+                <!-- Las noticias se cargarán aquí dinámicamente -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-col">
+                <h3>Contacto</h3>
+                <p>94 467 05 11 – 94 467 34 61</p>
+                <p>smeskola@erandio.eus</p>
+                <p>Erandio, Bizkaia</p>
+            </div>
+            <div class="footer-col">
+                <h3>Enlaces Rápidos</h3>
+                <ul>
+                    <li><a href="asignaturas.html">Asignaturas e Instrumentos</a></li>
+                    <li><a href="profesorado.html">Nuestro Profesorado</a></li>
+                    <li><a href="calendario.html">Calendario Escolar</a></li>
+                    <li><a href="backoffice.html">Administración</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Avisos Legales</h3>
+                <ul>
+                    <li><a href="#">Política de Privacidad</a></li>
+                    <li><a href="#">Política de Cookies</a></li>
+                </ul>
+            </div>
+        </div>
+        <p class="copyright">&copy; 2026 Erandioko Musika Eskola - Ayuntamiento de Erandio Udala</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>

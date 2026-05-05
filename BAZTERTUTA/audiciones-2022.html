@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audiciones 2022 | Erandioko Musika Eskola</title>
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 2rem;
+        }
+        @media (max-width: 600px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="img/logo-trans-zuria.png" alt="Erandioko Musika Eskola Logo">
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="asignaturas.html">Asignaturas</a>
+                <a href="profesorado.html">Profesorado</a>
+                <a href="ejercicios.html">Ejercicios</a>
+                <a href="calendario.html">Calendario</a>
+                <a href="matricula.html">Matrícula</a>
+                <a href="contacto.html">Contacto</a>
+                            <div class="lang-selector">
+                    <a href="audiciones-2022.html" class="active">ES</a>
+                    <span>|</span>
+                    <a href="audiciones-2022-eu.html">EU</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section>
+            
+            <h2>Audiciones 2022</h2>
+            
+            <div class="video-grid">
+                <div style="margin-bottom: 3rem;"><div class="video-container"><iframe src="https://www.youtube.com/embed/u2vtSXZLsKw" allowfullscreen></iframe></div><a href="https://www.youtube.com/watch?v=u2vtSXZLsKw" target="_blank" class="btn-more" style="background:#e74c3c; display: block; text-align: center;">Ver en YouTube (si el reproductor falla)</a></div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p class="copyright">&copy; 2026 Erandioko Musika Eskola</p>
+    </footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profesorado | Erandioko Musika Eskola</title>
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .teacher-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        .teacher-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--primary-color);
+        }
+        .teacher-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.2rem;
+        }
+        .teacher-subject {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .tutoring {
+            background: var(--gray-light);
+            padding: 0.8rem;
+            border-radius: 8px;
+        }
+        .tutoring-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--gray-dark);
+        }
+        .tutoring-list {
+            font-size: 0.9rem;
+            padding-left: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="img/logo-trans-zuria.png" alt="Erandioko Musika Eskola Logo">
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="asignaturas.html">Asignaturas</a>
+                <a href="profesorado.html" class="active">Profesorado</a>
+                <a href="ejercicios.html">Ejercicios</a>
+                <a href="calendario.html">Calendario</a>
+                <a href="matricula.html">Matrícula</a>
+                <a href="contacto.html">Contacto</a>
+                            <div class="lang-selector">
+                    <a href="profesorado.html" class="active">ES</a>
+                    <span>|</span>
+                    <a href="profesorado-eu.html">EU</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section>
+            <h2>Nuestro Profesorado</h2>
+            <div class="search-container-modern" style="margin-bottom: 2rem;">
+                <input type="text" id="teacher-search" placeholder="🔍 Buscar profesor o instrumento..." class="search-input-modern">
+            </div>
+            <div id="teachers-grid-dynamic" class="profesorado-grid">
+                <!-- Carga dinámica -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-col">
+                <h3>Erandioko Musika Eskola</h3>
+                <p>94 467 05 11 – 94 467 34 61</p>
+                <p>smeskola@erandio.eus</p>
+            </div>
+        </div>
+        <p class="copyright">&copy; 2026 Erandioko Musika Eskola</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

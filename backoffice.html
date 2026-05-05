@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración | Erandioko Musika Eskola</title>
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+    <style>
+        .ql-editor img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body style="background: #5eabdc;">
+
+    <!-- Login Overlay -->
+    <div id="login-overlay"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #5eabdc; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+        <div
+            style="background: white; padding: 3rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: center; max-width: 400px; width: 90%;">
+            <h2 style="color: #5eabdc; margin-bottom: 1.5rem; font-family: 'Inter', sans-serif;">Acceso Restringido</h2>
+            <input type="password" id="login-password" placeholder="Clave de acceso"
+                style="width: 100%; padding: 1rem; border: 2px solid #e0e0e0; border-radius: 10px; margin-bottom: 1.5rem; font-size: 1rem; font-family: 'Inter', sans-serif; box-sizing: border-box;">
+            <button onclick="checkPassword()" class="btn btn-primary"
+                style="width: 100%; padding: 1rem; font-size: 1.1rem; border: none; cursor: pointer;">Entrar</button>
+            <p id="login-error"
+                style="color: #e74c3c; margin-top: 1rem; display: none; font-size: 0.9rem; font-weight: 600;">Clave
+                incorrecta</p>
+            <div style="margin-top: 1.5rem;">
+                <a href="index.html" style="color: #7f8c8d; text-decoration: none; font-size: 0.9rem;">Volver a la
+                    Web</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        function checkPassword() {
+            if (document.getElementById('login-password').value === "erandio2026") {
+                document.getElementById('login-overlay').style.display = 'none';
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('login-password').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    checkPassword();
+                }
+            });
+            document.getElementById('login-password').focus();
+        });
+    </script>
+
+    <div class="admin-header">
+        <h2>Panel de Administración</h2>
+        <div style="display:flex; gap: 1rem; align-items:center;">
+            <div class="lang-selector" style="border:none; margin:0; padding:0;">
+                <a href="backoffice.html" class="active" style="color:white; font-weight:bold;">ES</a>
+                <span style="color:white;">|</span>
+                <a href="backoffice-eu.html" style="color:rgba(255,255,255,0.7);">EU</a>
+            </div>
+            <a href="index.html" class="btn btn-primary">Volver a la Web</a>
+        </div>
+    </div>
+
+    <main>
+        <div class="admin-tabs">
+            <button class="tab-btn active" onclick="showSection('news')">Noticias</button>
+            <button class="tab-btn" onclick="showSection('subjects')">Asignaturas</button>
+            <button class="tab-btn" onclick="showSection('teachers')">Profesorado</button>
+            <button class="tab-btn" onclick="showSection('events')">Eventos</button>
+            <button class="tab-btn" onclick="showSection('menu')">Menú</button>
+        </div>
+
+        <!-- NOTICIAS -->
+        <div id="section-news" class="admin-section active">
+            <div class="admin-card">
+                <h3>Publicar / Editar Noticia</h3>
+                <form id="news-form" style="margin-top: 1.5rem;">
+                    <input type="hidden" id="news-id">
+                    <div class="news-form-grid">
+                        <div class="form-group">
+                            <label for="news-title">Título (ES)</label>
+                            <input type="text" id="news-title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="news-title-eu">Izenburua (EU)</label>
+                            <input type="text" id="news-title-eu" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="news-date">Fecha Visual (ES/EU)</label>
+                            <input type="date" id="news-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="news-publish-date">Fecha Publicación (Automático)</label>
+                            <input type="date" id="news-publish-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="news-expiry-date">Fecha Expiración (Desaparece)</label>
+                            <input type="date" id="news-expiry-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="news-img-file">Imagen Principal / Irudi Nagusia</label>
+                            <input type="file" id="news-img-file" accept="image/*" style="background: rgba(255,255,255,0.1); padding: 0.5rem; color: white; width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
+                            <input type="hidden" id="news-img">
+                            <div id="news-img-preview" style="height: 100px; width: 100%; background-size: contain; background-position: left center; background-repeat: no-repeat; display: none;"></div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="news-summary" style="display:block; margin-bottom:0.5rem; color:white;">Entradilla / Resumen Breve (ES)</label>
+                            <textarea id="news-summary" rows="3" style="width: 100%; padding: 0.8rem; border-radius: 6px; border: none; margin-bottom: 1rem;" required></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="news-summary-eu" style="display:block; margin-bottom:0.5rem; color:white;">Sarrera / Laburpen Laburra (EU)</label>
+                            <textarea id="news-summary-eu" rows="3" style="width: 100%; padding: 0.8rem; border-radius: 6px; border: none; margin-bottom: 1rem;" required></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <label style="margin: 0;">Noticia Completa / Eduki Osoa (ES)</label>
+                                <button type="button" onclick="toggleHtml('es')" class="btn"
+                                    style="background: #333; color: white; padding: 0.3rem 0.6rem; font-size: 0.8rem; border-radius: 4px;">&lt;&gt;
+                                    Editar HTML</button>
+                            </div>
+                            <div id="editor-es" style="height: 150px; background: white; color: black;"></div>
+                            
+                        </div>
+                        <div class="form-group full-width">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <label style="margin: 0;">Noticia Completa (EU)</label>
+                                <button type="button" onclick="toggleHtml('eu')" class="btn"
+                                    style="background: #333; color: white; padding: 0.3rem 0.6rem; font-size: 0.8rem; border-radius: 4px;">&lt;&gt;
+                                    Editar HTML</button>
+                            </div>
+                            <div id="editor-eu" style="height: 150px; background: white; color: black;"></div>
+                            
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" id="news-on-home" checked>
+                            <label for="news-on-home" style="display:inline">Mostrar en Inicio</label>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                        <button type="submit" id="submit-news-btn" class="btn btn-success">Publicar Noticia</button>
+                        <button type="reset" class="btn btn-danger">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="admin-card">
+                <h3>Gestión de Noticias</h3>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Título</th>
+                            <th>Home</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-news-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ASIGNATURAS -->
+        <div id="section-subjects" class="admin-section">
+            <div class="admin-card">
+                <h3>Añadir / Editar Asignatura</h3>
+                <form id="subjects-form" style="margin-top: 1.5rem;">
+                    <input type="hidden" id="subject-id">
+                    <div class="news-form-grid">
+                        <div class="form-group">
+                            <label for="subject-name">Nombre (ES)</label>
+                            <input type="text" id="subject-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject-name-eu">Izena (EU)</label>
+                            <input type="text" id="subject-name-eu" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="subject-teachers">Profesores (Nombres separados por comas)</label>
+                            <input type="text" id="subject-teachers" placeholder="Ej: Iñaki Allende, Yolanda Sierra">
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                        <button type="submit" id="submit-subject-btn" class="btn btn-success">Guardar
+                            Asignatura</button>
+                        <button type="reset" class="btn btn-danger">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="admin-card">
+                <h3>Lista de Asignaturas</h3>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre (ES)</th>
+                            <th>Nombre (EU)</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-subjects-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PROFESORADO -->
+        <div id="section-teachers" class="admin-section">
+            <div class="admin-card">
+                <h3>Añadir / Editar Profesor/a</h3>
+                <form id="teachers-form" style="margin-top: 1.5rem;">
+                    <input type="hidden" id="teacher-id">
+                    <div class="news-form-grid">
+                        <div class="form-group">
+                            <label for="teacher-name">Nombre</label>
+                            <input type="text" id="teacher-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="teacher-instrument">Instrumento / Asignatura (ES)</label>
+                            <input type="text" id="teacher-instrument" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="teacher-instrument-eu">Instrumentua (EU)</label>
+                            <input type="text" id="teacher-instrument-eu" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Tutorías (ES)</label>
+                            <textarea id="teacher-tutoring" placeholder="Lunes: 18:30-18:45 - Astrabudua"></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Tutoretzak (EU)</label>
+                            <textarea id="teacher-tutoring-eu"
+                                placeholder="Astelehena: 18:30-18:45 - Astrabudua"></textarea>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                        <button type="submit" id="submit-teacher-btn" class="btn btn-success">Guardar
+                            Profesor/a</button>
+                        <button type="reset" class="btn btn-danger">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="admin-card">
+                <h3>Lista de Profesorado</h3>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Asignatura</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-teachers-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- EVENTOS -->
+        <div id="section-events" class="admin-section">
+            <div class="admin-card" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3>Gestión de Eventos y Calendario</h3>
+                    <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">Gestiona los eventos y configura los días lectivos.</p>
+                </div>
+                <button class="btn btn-primary" onclick="openCalendarConfig()">Configurar Días No Lectivos</button>
+            </div>
+            
+            <div class="admin-card">
+                <h3>Crear / Editar Evento</h3>
+                <form id="events-form" style="margin-top: 1.5rem;">
+                    <input type="hidden" id="event-id">
+                    <div class="news-form-grid">
+                        <div class="form-group">
+                            <label for="event-title">Título del Evento (ES)</label>
+                            <input type="text" id="event-title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-title-eu">Ekitaldiaren Izenburua (EU)</label>
+                            <input type="text" id="event-title-eu" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-type">Tipo de Evento (ES)</label>
+                            <input type="text" id="event-type" placeholder="Ej: Concierto, Audición, Taller..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-type-eu">Ekitaldi Mota (EU)</label>
+                            <input type="text" id="event-type-eu" placeholder="Adib: Kontzertua, Entzunaldia..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-date">Día del Evento / Data</label>
+                            <input type="date" id="event-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-time">Hora del Evento / Ordua</label>
+                            <input type="time" id="event-time" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="event-img">Imagen del Evento (URL) / Irudia</label>
+                            <input type="text" id="event-img" placeholder="https://ejemplo.com/imagen.jpg">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="event-summary">Entradilla (ES)</label>
+                            <textarea id="event-summary" rows="2"></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="event-summary-eu">Sarrera (EU)</label>
+                            <textarea id="event-summary-eu" rows="2"></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Descripción Detallada (ES)</label>
+                            <div id="event-editor-es" style="height: 150px; background: white; color: black;"></div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Deskribapen Zehatza (EU)</label>
+                            <div id="event-editor-eu" style="height: 150px; background: white; color: black;"></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                        <button type="submit" class="btn btn-success">Guardar Evento</button>
+                        <button type="reset" class="btn btn-danger">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="admin-card">
+                <h3>Lista de Eventos</h3>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Evento</th>
+                            <th>Tipo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-events-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MENÚ -->
+        <div id="section-menu" class="admin-section">
+            <div class="admin-card">
+                <h3>Gestión del Menú Principal</h3>
+                <p style="margin-bottom: 1.5rem; color: #666;">Activa o desactiva las secciones del menú en todos los
+                    idiomas.</p>
+                <div id="admin-menu-body" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <!-- Se carga dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <script src="script.js"></script>
+    <script>
+        function showSection(name) {
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('section-' + name).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

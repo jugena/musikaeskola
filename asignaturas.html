@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignaturas | Erandioko Musika Eskola</title>
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .subjects-section {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        .subject-item {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--gray-light);
+            padding-bottom: 1.5rem;
+        }
+        .subject-item:last-child {
+            border-bottom: none;
+        }
+        .subject-name {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .profesorado-list {
+            list-style: disc;
+            margin-left: 1.5rem;
+            color: var(--gray-dark);
+        }
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        .group-card {
+            background: var(--gray-light);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="img/logo-trans-zuria.png" alt="Erandioko Musika Eskola Logo">
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="asignaturas.html" class="active">Asignaturas</a>
+                <a href="profesorado.html">Profesorado</a>
+                <a href="ejercicios.html">Ejercicios</a>
+                <a href="calendario.html">Calendario</a>
+                <a href="matricula.html">Matrícula</a>
+                <a href="contacto.html">Contacto</a>
+                            <div class="lang-selector">
+                    <a href="asignaturas.html" class="active">ES</a>
+                    <span>|</span>
+                    <a href="asignaturas-eu.html">EU</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section>
+            <h2>Asignaturas e Instrumentos</h2>
+            <div class="search-container-modern" style="margin-bottom: 2rem;">
+                <input type="text" id="subject-search" placeholder="🔍 Buscar asignatura o instrumento..." class="search-input-modern">
+            </div>
+            <div id="subjects-grid-dynamic" class="subjects-grid">
+                <!-- Carga dinámica -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-col">
+                <h3>Contacto</h3>
+                <p>94 467 05 11 – 94 467 34 61</p>
+                <p>smeskola@erandio.eus</p>
+            </div>
+            <div class="footer-col">
+                <h3>Redes Sociales</h3>
+                <p><a href="https://www.facebook.com/erandiokomusikaeskola" target="_blank">Facebook</a></p>
+            </div>
+        </div>
+        <p class="copyright">&copy; 2026 Erandioko Musika Eskola</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

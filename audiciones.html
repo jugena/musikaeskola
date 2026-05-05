@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audiciones | Erandioko Musika Eskola</title>
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .auditions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .audition-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+            border-top: 4px solid var(--primary-color);
+        }
+        .audition-card:hover {
+            transform: scale(1.03);
+        }
+        .audition-year {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        .audition-desc {
+            color: var(--gray-dark);
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="img/logo-trans-zuria.png" alt="Erandioko Musika Eskola Logo">
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="asignaturas.html">Asignaturas</a>
+                <a href="profesorado.html">Profesorado</a>
+                <a href="ejercicios.html">Ejercicios</a>
+                <a href="calendario.html">Calendario</a>
+                <a href="matricula.html">Matrícula</a>
+                <a href="contacto.html">Contacto</a>
+                            <div class="lang-selector">
+                    <a href="audiciones.html" class="active">ES</a>
+                    <span>|</span>
+                    <a href="audiciones-eu.html">EU</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section>
+            <h2>Audiciones</h2>
+            <p>Accede a las listas de reproducción y grabaciones de las audiciones celebradas en nuestra escuela.</p>
+            
+            <div class="auditions-grid">
+                <!-- 2022 -->
+                <div class="audition-card">
+                    <div class="audition-year">2022</div>
+                    <p class="audition-desc">Audiciones celebradas en el 2022</p>
+                    <a href="audiciones-2022.html" class="btn-more">Ver Audiciones</a>
+                </div>
+
+                <!-- 2021 -->
+                <div class="audition-card">
+                    <div class="audition-year">2021</div>
+                    <p class="audition-desc">Audiciones celebradas en el 2021</p>
+                    <a href="audiciones-2021.html" class="btn-more">Ver Audiciones</a>
+                </div>
+
+                <!-- 2020 -->
+                <div class="audition-card">
+                    <div class="audition-year">2020</div>
+                    <p class="audition-desc">Audiciones celebradas en el 2020</p>
+                    <a href="audiciones-2020.html" class="btn-more">Ver Audiciones</a>
+                </div>
+
+                <!-- 2019 -->
+                <div class="audition-card">
+                    <div class="audition-year">2019</div>
+                    <p class="audition-desc">Audiciones celebradas en el 2019</p>
+                    <a href="audiciones-2019.html" class="btn-more">Ver Audiciones</a>
+                </div>
+
+                <!-- 2018 -->
+                <div class="audition-card">
+                    <div class="audition-year">2018</div>
+                    <p class="audition-desc">Audiciones celebradas en el 2018</p>
+                    <a href="audiciones-2018.html" class="btn-more">Ver Audiciones</a>
+                </div>
+
+                <!-- 2017 -->
+                <div class="audition-card">
+                    <div class="audition-year">2017</div>
+                    <p class="audition-desc">Audiciones celebradas en el 2017</p>
+                    <a href="audiciones-2017.html" class="btn-more">Ver Audiciones</a>
+                </div>
+
+                <!-- 2015 -->
+                <div class="audition-card">
+                    <div class="audition-year">2015</div>
+                    <p class="audition-desc">Audiciones celebradas en el 2015</p>
+                    <a href="audiciones-2015.html" class="btn-more">Ver Audiciones</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-col">
+                <h3>Audiciones Históricas</h3>
+                <p>Nuestra escuela mantiene un archivo de las interpretaciones de nuestros alumnos y alumnas.</p>
+            </div>
+        </div>
+        <p class="copyright">&copy; 2026 Erandioko Musika Eskola</p>
+    </footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

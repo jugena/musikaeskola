@@ -1,0 +1,810 @@
+:root {
+    /* Color Inversion: Blue becomes White, White becomes Blue */
+    --primary-color: #ffffff;
+    --primary-dark: #f0f0f0;
+    --accent-color: #5eabdc;
+    --text-color: #ffffff;
+    --bg-color: #5eabdc;
+    --white: #5eabdc; 
+    --gray-light: rgba(255, 255, 255, 0.2);
+    --gray-dark: #f8f9fa;
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+}
+
+header {
+    background: var(--accent-color);
+    box-shadow: var(--shadow);
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo img {
+    height: 60px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.lang-selector {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-left: 1.5rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+    padding-left: 1.5rem;
+}
+
+.lang-selector a {
+    color: rgba(255, 255, 255, 0.7);
+    padding: 2px 4px;
+}
+
+.lang-selector a.active {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.nav-links a {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+.nav-links a:hover, .nav-links a.active {
+    color: var(--primary-color);
+}
+
+/* Hero Section with Video fix */
+.hero {
+    position: relative;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff; /* Text color changed to white as requested */
+    text-align: center;
+    padding: 2rem;
+    overflow: hidden;
+    background: white; /* This will be the bottom layer */
+}
+
+.video-bg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    opacity: 0.8; 
+    z-index: 1; /* Above background */
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3); /* Darker overlay to make white text pop */
+    z-index: 2; /* Above video */
+}
+
+.hero h1, .hero p {
+    position: relative;
+    z-index: 10; /* Above everything */
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5); /* Shadow for readability */
+}
+
+/* Rest of the styles... */
+main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+section {
+    margin-bottom: 4rem;
+}
+
+h2 {
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: var(--primary-color);
+    border-radius: 2px;
+}
+
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.news-card {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+}
+
+.news-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.news-img {
+    height: 200px;
+    background-color: rgba(255, 255, 255, 0.2);
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+}
+
+.news-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.news-date {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.news-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.news-excerpt {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+.btn-more {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    background: var(--primary-color);
+    color: #5eabdc;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-top: auto;
+    text-align: center;
+}
+
+footer {
+    background: rgba(0, 0, 0, 0.1);
+    color: var(--white);
+    padding: 4rem 2rem 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 3rem;
+}
+
+.footer-col h3 {
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+}
+
+.copyright {
+    text-align: center;
+    padding-top: 3rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 3rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+}
+
+/* Backoffice */
+.admin-header {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th, .admin-table td {
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    border: none;
+}
+
+.btn-primary { background: var(--primary-color); color: #5eabdc; }
+.btn-danger { background: #ff5e5e; color: white; }
+.btn-success { background: #45f18e; color: #1e4d31; }
+
+.news-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+/* Backoffice Tabs */
+.admin-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1rem;
+}
+
+.tab-btn {
+    padding: 0.8rem 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: var(--transition);
+}
+
+.tab-btn.active {
+    background: var(--primary-color);
+    color: #5eabdc;
+}
+
+.admin-section {
+    display: none;
+}
+
+.admin-section.active {
+    display: block;
+}
+
+.form-group label {
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 6px;
+    border: none;
+}
+
+/* Subjects and Teachers Grid Styles */
+.subjects-grid, .profesorado-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.subject-item, .teacher-card {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: var(--transition);
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.subject-item:hover, .teacher-card:hover {
+    background: #fdfdfd;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.search-input-modern {
+    width: 100%;
+    padding: 1.2rem 2rem;
+    border-radius: 50px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1.1rem;
+    outline: none;
+    transition: var(--transition);
+    backdrop-filter: blur(5px);
+}
+
+.search-input-modern::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search-input-modern:focus {
+    border-color: white;
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 20px rgba(255,255,255,0.1);
+}
+
+/* If the background of the page is white, adjust search bar */
+body:not(.home) .search-input-modern {
+    background: white;
+    color: #333;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+body:not(.home) .search-input-modern::placeholder {
+    color: #999;
+}
+
+body:not(.home) .search-input-modern:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 15px rgba(94, 171, 220, 0.2);
+}
+
+.subject-name, .teacher-name {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.teacher-subject {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.tutoring {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tutoring-title {
+    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.tutoring-list {
+    font-size: 0.9rem;
+    color: #555555;
+}
+
+.profesorado-list {
+    list-style: none;
+    padding: 0;
+}
+
+.profesorado-list li {
+    margin-bottom: 0.5rem;
+    padding-left: 1.2rem;
+    position: relative;
+}
+
+.profesorado-list li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .nav-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+    }
+    .lang-selector {
+        margin-left: 0;
+        padding-left: 0;
+        border-left: none;
+        width: 100%;
+        justify-content: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        padding-top: 0.5rem;
+    }
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+    .news-form-grid {
+        grid-template-columns: 1fr;
+    }
+    .admin-tabs {
+        flex-wrap: wrap;
+    }
+    .admin-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+    .nav-links {
+        gap: 0.5rem;
+    }
+    .nav-links a {
+        font-size: 0.8rem;
+    }
+    .admin-card {
+        padding: 1.5rem 1rem;
+    }
+    .tab-btn {
+        width: 100%;
+    }
+}
+
+/* News & Event Content Images */
+.news-full-content img,
+.event-full-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    display: block;
+}
+
+/* Calendar Modern Styles */
+.calendar-controls button {
+    cursor: pointer;
+    border: none;
+    transition: var(--transition);
+}
+
+.view-btn {
+    padding: 0.6rem 1.2rem;
+    background: transparent;
+    color: white;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+.view-btn.active {
+    background: white;
+    color: #5eabdc;
+}
+
+.nav-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.calendar-modern-container {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    overflow: hidden;
+    min-height: 400px;
+}
+
+.calendar-grid-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: rgba(255, 255, 255, 0.1);
+    text-align: center;
+    font-weight: bold;
+    padding: 1rem 0;
+}
+
+.calendar-grid-body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.calendar-day {
+    min-height: 120px;
+    background: #e0e0e0; /* Gris claro por defecto (día lectivo sin eventos) */
+    padding: 0.5rem;
+    position: relative;
+    transition: var(--transition);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.calendar-day.has-events {
+    background: #ffffff; /* Blanco si hay eventos */
+    color: #333;
+}
+
+.calendar-day.has-events .calendar-day-num {
+    color: #5eabdc;
+}
+
+.calendar-day.non-teaching {
+    background: #002244 !important; /* Azul muy oscuro */
+    color: white;
+}
+
+.calendar-day:hover {
+    filter: brightness(1.1);
+}
+
+.calendar-day.other-month {
+    opacity: 0.3;
+}
+
+.calendar-day.today {
+    box-shadow: inset 0 0 0 2px var(--primary-color);
+}
+
+.calendar-day-num {
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.calendar-events {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.event-tag {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #5eabdc;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.calendar-day.non-teaching .event-tag {
+    background: #4a8ab3; /* Azul más bajo para eventos en días no lectivos */
+}
+
+/* Week View */
+.calendar-week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    min-height: 500px;
+}
+
+.week-day-col {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Day View */
+.calendar-day-detail {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.event-card-horizontal {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    overflow: hidden;
+}
+
+.event-card-img {
+    width: 200px;
+    background-size: cover;
+    background-position: center;
+}
+
+.event-card-content {
+    padding: 1.5rem;
+    flex: 1;
+}
+
+/* Year View */
+.calendar-year-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+}
+
+.month-mini {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.month-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    font-size: 0.7rem;
+    text-align: center;
+}
+
+.day-mini {
+    padding: 4px 0;
+}
+
+.day-mini.has-event {
+    background: var(--primary-color);
+    color: var(--bg-color);
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+/* Modal for Event Details */
+.event-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.event-modal {
+    background: white;
+    color: #333;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    border-radius: 20px;
+    overflow-y: auto;
+    position: relative;
+}
+
+.event-modal-header {
+    height: 400px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    border-bottom: 4px solid var(--primary-color);
+}
+
+.event-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    font-weight: bold;
+}
+
+.event-modal-body {
+    padding: 3rem;
+}
+
+@media (max-width: 768px) {
+    .calendar-grid-header, .calendar-grid-body {
+        grid-template-columns: repeat(7, 1fr);
+    }
+    .calendar-day {
+        min-height: 80px;
+    }
+    .event-tag {
+        font-size: 0.6rem;
+    }
+    .event-card-horizontal {
+        flex-direction: column;
+    }
+    .event-card-img {
+        width: 100%;
+        height: 150px;
+    }
+}

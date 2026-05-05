@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inskripzio-Fitxa 2026-27 - Erandioko Musika Eskola</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Fuentes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --erandio-blue: #5eabdc;
+            --border-color: #5eabdc;
+            --text-color: #5eabdc;
+            --accent-color: #5eabdc;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Header Premium */
+        header.premium-header {
+            background: var(--accent-color);
+            padding: 0.8rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-ayto img {
+            height: 60px;
+            transition: var(--transition);
+        }
+
+        .logo-ayto:hover img {
+            transform: scale(1.05);
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--accent-color); 
+            padding: 60px 0 20px 0; 
+            margin: 0;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-container { 
+            background: white; 
+            max-width: 950px; 
+            margin: 0 auto; 
+            padding: 15px 40px 40px 40px; 
+            border: 1px solid var(--border-color); 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+            border-radius: 10px;
+        }
+
+        /* --- CABECERA ESTILO ERANDIO --- */
+        .header-erandio {
+            display: flex;
+            align-items: stretch;
+            border: 2px solid var(--border-color);
+            margin-bottom: 25px;
+            background-color: var(--erandio-blue);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .logo-container {
+            padding: 5px;
+            border-right: 2px solid var(--border-color);
+            flex: 0 0 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+        }
+
+        .logo-container img {
+            max-width: 90%;
+            height: auto;
+        }
+
+        .title-container {
+            flex-grow: 1;
+            padding: 8px;
+            text-align: center;
+            background-color: var(--erandio-blue);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0;
+            text-transform: uppercase;
+            line-height: 1.2;
+            color: white;
+            letter-spacing: 1px;
+        }
+        .header-subtitle {
+            font-size: 0.85rem;
+            color: white;
+            margin-top: 4px;
+            font-weight: normal;
+        }
+
+        /* --- SECCIONES --- */
+        .section { 
+            margin-bottom: 30px; 
+            border: 2px solid var(--border-color); 
+            border-radius: 8px; 
+            background: white;
+            break-inside: avoid;
+            page-break-inside: avoid;
+            display: block;
+            position: relative;
+        }
+        .section-header { 
+            background-color: var(--erandio-blue); 
+            color: white; 
+            padding: 10px 15px; 
+            font-weight: bold; 
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        .section-content { padding: 20px 25px; }
+
+        .grid-row { display: grid; gap: 15px; margin-bottom: 15px; }
+        .col-2 { grid-template-columns: repeat(2, 1fr); }
+        .col-3 { grid-template-columns: repeat(3, 1fr); }
+        .col-1-2 { grid-template-columns: 1fr 2fr; }
+        .col-2-1 { grid-template-columns: 2fr 1fr; }
+        .col-personal { grid-template-columns: 3fr 1fr 1fr; }
+
+        label { display: block; font-weight: bold; font-size: 0.75rem; margin-bottom: 6px; color: var(--erandio-blue); }
+        
+        input[type="text"], input[type="email"], input[type="tel"], input[type="date"], select, textarea { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid var(--border-color); 
+            box-sizing: border-box; 
+            font-size: 0.9rem;
+            border-radius: 4px;
+            background-color: #fcfcfc;
+            color: var(--text-color);
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--erandio-blue);
+            background-color: #fff;
+        }
+
+        .checkbox-group { display: flex; gap: 20px; font-size: 0.85rem; margin: 10px 0; align-items: center; }
+        .checkbox-item { display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-color); }
+        .checkbox-item input { width: 18px; height: 18px; cursor: pointer; }
+
+        .priority-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+        .priority-number {
+            background: var(--erandio-blue);
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* --- FOOTER --- */
+        .footer-erandio {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-top: 20px;
+            border-top: 2px solid var(--border-color);
+            color: var(--text-color);
+        }
+        .signature-box {
+            border: 2px solid var(--border-color);
+            width: 250px;
+            height: 100px;
+            margin-top: 10px;
+            border-radius: 4px;
+            background: white;
+        }
+        .footer-info { 
+            line-height: 1.6; 
+            color: var(--erandio-blue); 
+            font-size: 0.85rem;
+        }
+        .date-line {
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .no-pdf { text-align: center; margin-top: 60px; margin-bottom: 30px; }
+        .btn-pdf { 
+            background-color: #2c3e50; 
+            color: white; 
+            padding: 14px 28px; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            border-radius: 6px; 
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .btn-pdf:hover { background-color: #1a252f; }
+        
+        @media print { 
+            .no-pdf, .premium-header { display: none !important; } 
+            body { padding: 0; background: white; }
+            .form-container { box-shadow: none; border: none; padding: 0; }
+        }
+        /* Footer */
+        footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.05);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 2rem;
+        }
+
+        .copyright {
+            color: var(--erandio-blue);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="no-pdf">
+    <button class="btn-pdf" onclick="generatePDF()">DESKARGATU PDF / DESCARGAR PDF</button>
+</div>
+
+<div class="form-container" id="documento">
+    <header class="header-erandio">
+        <div class="logo-container">
+            <img src="data:image/png;base64,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" alt="Erandioko Udala">
+        </div>
+        <div class="title-container">
+            <h1 class="header-title">INSKRIPZIO-FITXA 2026-27 / BOLETÍN DE INSCRIPCIÓN</h1>
+            <h2 class="header-subtitle">ERANDIOKO MUSIKA ESKOLA / ESCUELA DE MÚSICA DE ERANDIO</h2>
+        </div>
+    </header>
+
+    <!-- SECTION 1: PERSONAL DATA -->
+    <section class="section">
+        <div class="section-header">DATU PERTSONALAK / DATOS PERSONALES</div>
+        <div class="section-content">
+            <div class="grid-row col-2-1">
+                <div>
+                    <label for="nombre">Izen-abizenak / Nombre y apellidos</label>
+                    <input type="text" id="nombre">
+                </div>
+                <div>
+                    <label for="dni">NAN / DNI</label>
+                    <input type="text" id="dni">
+                </div>
+            </div>
+            
+            <div class="grid-row">
+                <div>
+                    <label for="direccion">Helbidea / Dirección</label>
+                    <input type="text" id="direccion">
+                </div>
+            </div>
+
+            <div class="grid-row col-3">
+                <div>
+                    <label for="cp">Posta-kodea / Código Postal</label>
+                    <input type="text" id="cp">
+                </div>
+                <div>
+                    <label for="municipio">Udalerria / Municipio</label>
+                    <input type="text" id="municipio" value="ERANDIO">
+                </div>
+                <div>
+                    <label for="provincia">Probintzia / Provincia</label>
+                    <input type="text" id="provincia" value="BIZKAIA">
+                </div>
+            </div>
+
+            <div class="grid-row col-3">
+                <div>
+                    <label for="fecha_nac">Jaioteguna / Fecha de nacimiento</label>
+                    <input type="date" id="fecha_nac">
+                </div>
+                <div>
+                    <label for="tel_fijo">Telefono finkoa / Teléfono fijo</label>
+                    <input type="tel" id="tel_fijo">
+                </div>
+                <div>
+                    <label for="tel_movil">Telefono mugikorra / Teléfono móvil</label>
+                    <input type="tel" id="tel_movil">
+                </div>
+            </div>
+
+            <div class="grid-row col-2-1">
+                <div>
+                    <label for="email">Email</label>
+                    <input type="email" id="email">
+                </div>
+                <div>
+                    <label for="sexo">Sexua / Sexo</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="radio" name="sexo" value="M"> Gizona / Hombre</label>
+                        <label class="checkbox-item"><input type="radio" name="sexo" value="F"> Emakumea / Mujer</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-row">
+                <div>
+                    <label for="ikastetxea">Ikastetxea / Centro escolar</label>
+                    <input type="text" id="ikastetxea">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: SUBJECTS -->
+    <section class="section">
+        <div class="section-header">ESKATUTAKO IRAKASGAIA(K) / ASIGNATURA(S) SOLICITADA(S)</div>
+        <div class="section-content">
+            <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">Lehentasun-ordena adierazi (1etik 4ra) / Indicar orden de prioridad (del 1 al 4):</p>
+            
+            <div class="priority-row">
+                <div class="priority-number">1</div>
+                <input type="text" placeholder="Instrumentua edo irakasgaia / Instrumento o asignatura">
+            </div>
+            <div class="priority-row">
+                <div class="priority-number">2</div>
+                <input type="text" placeholder="Instrumentua edo irakasgaia / Instrumento o asignatura">
+            </div>
+            <div class="priority-row">
+                <div class="priority-number">3</div>
+                <input type="text" placeholder="Instrumentua edo irakasgaia / Instrumento o asignatura">
+            </div>
+            <div class="priority-row">
+                <div class="priority-number">4</div>
+                <input type="text" placeholder="Instrumentua edo irakasgaia / Instrumento o asignatura">
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: PARENTS -->
+    <section class="section" style="break-inside: avoid; page-break-inside: avoid;">
+        <div class="section-header">GURASO EDO TUTOREAK / MADRES-PADRES O TUTORES</div>
+        <div class="section-content">
+            <div class="grid-row col-2" style="gap: 30px;">
+                <!-- Parent 1 -->
+                <div>
+                    <h4 style="margin: 0 0 10px 0; font-size: 0.85rem; border-bottom: 2px solid var(--border-color); padding-bottom: 5px; color: var(--erandio-blue);">1. Gurasoa/Tutorea</h4>
+                    <div style="margin-bottom: 10px;">
+                        <label for="tutore1_nom">Izena / Nombre</label>
+                        <input type="text" id="tutore1_nom">
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <label for="tutore1_dni">NAN / DNI</label>
+                        <input type="text" id="tutore1_dni">
+                    </div>
+                    <div>
+                        <label for="tutore1_mail">Email</label>
+                        <input type="email" id="tutore1_mail">
+                    </div>
+                </div>
+                
+                <!-- Parent 2 -->
+                <div>
+                    <h4 style="margin: 0 0 10px 0; font-size: 0.85rem; border-bottom: 2px solid var(--border-color); padding-bottom: 5px; color: var(--erandio-blue);">2. Gurasoa/Tutorea</h4>
+                    <div style="margin-bottom: 10px;">
+                        <label for="tutore2_nom">Izena / Nombre</label>
+                        <input type="text" id="tutore2_nom">
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <label for="tutore2_dni">NAN / DNI</label>
+                        <input type="text" id="tutore2_dni">
+                    </div>
+                    <div>
+                        <label for="tutore2_mail">Email</label>
+                        <input type="email" id="tutore2_mail">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <div class="footer-erandio">
+        <div class="footer-info">
+            <div class="date-line">
+                Erandion, 2026eko ............aren ......(a) / En Erandio, a ...... de ............ de 2026
+            </div>
+            <p><strong>ERANDIOKO MUSIKA ESKOLA</strong><br>
+            Tartanga 15, 48950 Erandio<br>
+            Tel: 94 467 62 60 | Email: musikaeskola@erandio.eus</p>
+        </div>
+        <div>
+            <label style="text-align: center;">Sinadura / Firma</label>
+            <div class="signature-box"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function generatePDF() {
+        const element = document.getElementById('documento');
+        const btn = document.querySelector('.btn-pdf');
+        const originalText = btn.innerText;
+        
+        btn.innerText = 'Sortzen... / Generando...';
+        btn.disabled = true;
+
+        const opt = {
+            margin:       [5, 10, 10, 10],
+            filename:     'Aurre-Matrikula_Musika_Eskola_2026-27.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { 
+                scale: 2, 
+                useCORS: true,
+                allowTaint: true,
+                logging: true 
+            },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak:    { mode: ['css', 'legacy'], avoid: '.section' }
+        };
+
+        html2pdf().from(element).set(opt).save().then(() => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }).catch(err => {
+            console.error('PDF error:', err);
+            alert('Errorea PDF sortzean / Error al generar el PDF: ' + err.message);
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
+    }
+</script>
+
+    <footer>
+        <p class="copyright">&copy; 2026 Erandioko Musika Eskola — Erandioko Udala / Ayuntamiento de Erandio</p>
+    </footer>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

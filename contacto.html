@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto | Erandioko Musika Eskola</title>
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('img/kontaktua.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .contact-wrapper {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        .contact-info {
+            background: var(--primary-color);
+            color: var(--white);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+        .contact-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+        .contact-form {
+            background: var(--white);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 6px;
+            font-family: inherit;
+        }
+        .form-group textarea {
+            height: 150px;
+            resize: vertical;
+        }
+        .btn-submit {
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transition);
+        }
+        .btn-submit:hover {
+            background: var(--primary-dark);
+        }
+        @media (max-width: 992px) {
+            .contact-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="img/logo-trans-zuria.png" alt="Erandioko Musika Eskola Logo">
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="asignaturas.html">Asignaturas</a>
+                <a href="profesorado.html">Profesorado</a>
+                <a href="ejercicios.html">Ejercicios</a>
+                <a href="calendario.html">Calendario</a>
+                <a href="matricula.html">Matrícula</a>
+                <a href="contacto.html" class="active">Contacto</a>
+                            <div class="lang-selector">
+                    <a href="contacto.html" class="active">ES</a>
+                    <span>|</span>
+                    <a href="contacto-eu.html">EU</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section>
+            <h2>Contacto</h2>
+            <p style="margin-bottom: 3rem;">¿Tienes alguna duda? Ponte en contacto con nosotros a través de este formulario o mediante nuestros canales habituales.</p>
+            
+            <div class="contact-wrapper">
+                <div class="contact-info">
+                    <h3>Atención al Ciudadano</h3>
+                    <div class="info-item">
+                        <span>📍 Altzaga - Astrabudua</span>
+                    </div>
+                    <div class="info-item">
+                        <span>📞 94 467 05 11 – 94 467 34 61</span>
+                    </div>
+                    <div class="info-item">
+                        <span>✉️ smeskola@erandio.eus</span>
+                    </div>
+                    <p style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 2rem;">
+                        <strong>Horario de Secretaría:</strong><br>
+                        Lunes a Viernes: 15:00 - 20:00
+                    </p>
+                </div>
+
+                <div class="contact-form">
+                    <iframe
+                        id="JotFormIFrame-musikaeskola_harremana"
+                        title="Musika Eskola Harremana"
+                        onload="window.parent.scrollTo(0,0)"
+                        allowtransparency="true"
+                        allowfullscreen="true"
+                        src="https://form.jotform.com/sareaerandio/musikaeskola_harremana"
+                        frameborder="0"
+                        style="min-width:100%; height:1200px; border:none;"
+                        scrolling="no">
+                    </iframe>
+                    <script type="text/javascript">
+                        window.handleIFrameMessage = function(e) {
+                            if (typeof e.data === 'object') { return; }
+                            var args = e.data.split(":");
+                            if (args.length > 2) { iframe = document.getElementById("JotFormIFrame-" + args[(args.length - 1)]); } else { iframe = document.getElementById("JotFormIFrame-musikaeskola_harremana"); }
+                            if (!iframe) { return; }
+                            switch (args[0]) {
+                                case "setHeight":
+                                    iframe.style.height = args[1] + "px";
+                                    break;
+                            }
+                        };
+                        if (window.addEventListener) {
+                            window.addEventListener("message", handleIFrameMessage, false);
+                        } else if (window.attachEvent) {
+                            window.attachEvent("onmessage", handleIFrameMessage);
+                        }
+                    </script>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p class="copyright">&copy; 2026 Erandioko Musika Eskola</p>
+    </footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

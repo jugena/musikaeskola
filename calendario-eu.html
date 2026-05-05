@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario | Erandioko Musika Eskola</title>
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .calendar-container {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        .calendar-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="index-eu.html" class="logo">
+                <img src="img/logo-trans-zuria.png" alt="Erandioko Musika Eskola Logo">
+            </a>
+            <nav class="nav-links">
+                <a href="index-eu.html">Hasiera</a>
+                <a href="asignaturas-eu.html">Ikasgaiak</a>
+                <a href="profesorado-eu.html">Irakasleak</a>
+                <a href="ejercicios-eu.html">Ariketak</a>
+                <a href="calendario-eu.html" class="active">Egutegia</a>
+                <a href="matricula-eu.html">Matrikula</a>
+                <a href="contacto-eu.html">Kontaktua</a>
+                            <div class="lang-selector">
+                    <a href="calendario.html">ES</a>
+                    <span>|</span>
+                    <a href="calendario-eu.html"class="active">EU</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section>
+            <h2>Eskola Egutegia</h2>
+            <p style="margin-bottom: 2rem;">Ikusi ikasturteko data nagusiak, oporrak eta kontzertu egunak.</p>
+            
+            <div class="calendar-controls" style="margin-bottom: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                <div class="view-switches" style="display: flex; gap: 0.5rem; background: rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 50px;">
+                    <button class="view-btn active" onclick="setCalendarView('month')">Hilabetea</button>
+                    <button class="view-btn" onclick="setCalendarView('week')">Astea</button>
+                    <button class="view-btn" onclick="setCalendarView('day')">Eguna</button>
+                    <button class="view-btn" onclick="setCalendarView('year')">Urtea</button>
+                </div>
+                <div class="date-nav" style="display: flex; align-items: center; gap: 1rem;">
+                    <button class="nav-btn" onclick="changeCalendarDate(-1)">&larr;</button>
+                    <h3 id="current-view-title" style="min-width: 150px; text-align: center; color: white; margin: 0;"></h3>
+                    <button class="nav-btn" onclick="changeCalendarDate(1)">&rarr;</button>
+                </div>
+            </div>
+
+            <div id="calendar-view" class="calendar-modern-container">
+                <!-- Calendar content will be injected here -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p class="copyright">&copy; 2026 Erandioko Musika Eskola</p>
+    </footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

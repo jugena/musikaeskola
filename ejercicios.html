@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicios | Erandioko Musika Eskola</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- ABCJS for Music Notation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/abcjs/6.3.0/abcjs-basic-min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/abcjs/6.3.0/abcjs-audio.css">
+
+    <style>
+        :root {
+            --primary-ex: #6C5CE7;
+            --primary-hover-ex: #5A4FCF;
+            --secondary-ex: #00CEC9;
+            --panel-bg: rgba(255, 255, 255, 0.95);
+            --text-ex: #2D3436;
+            --text-light-ex: #636E72;
+            --ball-color: #FF7675;
+            --accent-radius: 16px;
+        }
+
+        /* Ocultar avisos de CSS de abcjs */
+        .abcjs-css-warning { display: none !important; }
+
+        .exercises-container {
+            padding: 2rem;
+            width: 90%;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .app-container {
+            width: 100%;
+            background: var(--panel-bg);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0,0,0,0.05);
+            overflow: hidden;
+            padding: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-top: 2rem;
+        }
+
+        .header-ex {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .header-ex h1 {
+            margin: 0;
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary-ex), var(--secondary-ex));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .header-ex p {
+            margin: 5px 0 0 0;
+            color: var(--text-light-ex);
+            font-size: 1.1rem;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.02);
+            padding: 24px;
+            border-radius: var(--accent-radius);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 140px;
+            flex: 1 1 auto;
+            max-width: 180px;
+        }
+
+        .control-group label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary-ex);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        select, input[type="number"] {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            background: #FFFFFF;
+            color: var(--text-ex);
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.04);
+            cursor: pointer;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--secondary-ex);
+            box-shadow: 0 0 0 4px rgba(0, 206, 201, 0.15);
+        }
+
+        .checkbox-group {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.04);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .checkbox-group summary {
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-ex);
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .checkbox-group summary::after {
+            content: "▼";
+            font-size: 0.8rem;
+            color: var(--primary-ex);
+        }
+
+        .dropdown-content {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 0 12px 10px 12px;
+        }
+
+        .cb-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-ex);
+            cursor: pointer;
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, var(--primary-ex), var(--primary-hover-ex));
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3);
+            margin: 1rem auto;
+            display: block;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 25px rgba(108, 92, 231, 0.4);
+        }
+
+        .score-container {
+            width: 100%;
+            min-height: 250px;
+            overflow-x: auto;
+            border-radius: var(--accent-radius);
+            padding: 40px;
+            background: #ffffff;
+            box-sizing: border-box;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            border: 1px solid rgba(0,0,0,0.03);
+            position: relative;
+        }
+
+        .tabs-ex {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 2px solid var(--primary-ex);
+            color: var(--primary-ex);
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: 0.3s;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            background: var(--primary-ex);
+            color: white;
+        }
+
+        .view-ex {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .view-ex.active {
+            display: flex;
+        }
+
+        /* Estilos universales para asegurar visibilidad total de la partitura */
+        .score-container svg { overflow: visible !important; }
+        .score-container path, .score-container line { 
+            stroke: #2d3436 !important; 
+            stroke-width: 1.2 !important; 
+            opacity: 1 !important; 
+        }
+        /* Las notas y silencios usan relleno, no trazo */
+        .abcjs-note path, .abcjs-rest path, .abcjs-clef path {
+            fill: #2d3436 !important;
+            stroke: none !important;
+        }
+        .abcjs-staff { stroke-width: 1 !important; }
+        .abcjs-bar { stroke-width: 2 !important; }
+        .abcjs-note.quiz-target path { fill: #00cec9 !important; }
+        .abcjs-note.quiz-error path { fill: #ff4757 !important; }
+
+        .audio-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #ffffff;
+            padding: 8px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.03);
+            margin: 1rem auto;
+            width: fit-content;
+        }
+
+        .piano-wrapper {
+            margin: 20px auto;
+            display: none;
+            justify-content: center;
+        }
+
+        .piano-key { cursor: pointer; }
+        .white-key { width: 36px; height: 140px; background: white; border: 1px solid #ccc; border-radius: 0 0 5px 5px; box-sizing: border-box; }
+        .black-key { width: 24px; height: 90px; background: #2d3436; position: absolute; top: 0; border-radius: 0 0 4px 4px; z-index: 2; }
+        .piano-key.active { background: #00cec9 !important; }
+
+        .guitar-fretboard { width: 100%; min-width: 600px; height: 180px; background: #5c4033; position: relative; border: 4px solid #3e2723; border-radius: 8px; overflow: hidden; }
+        .guitar-string { position: absolute; left: 0; width: 100%; background: #ecf0f1; }
+        .string-note-dot { position: absolute; width: 20px; height: 20px; background: var(--secondary-ex); border-radius: 50%; display: none; transform: translate(-50%, -50%); z-index: 3; }
+        .string-note-dot.active { display: block; }
+
+        .wind-instrument { width: 100%; max-width: 800px; background-size: contain; background-repeat: no-repeat; background-position: center; display: flex; align-items: center; justify-content: space-evenly; margin: 20px auto; position: relative; }
+        .wind-instrument.saxo { background-image: url('img/saxo.png'); height: 320px; }
+        .wind-instrument.flute { background-image: url('img/flute.png'); height: 180px; }
+        .wind-hole { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.8); border: 1px solid #ccc; }
+        .wind-hole.active { background: var(--secondary-ex); transform: scale(1.2); }
+
+        .stats-panel {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--primary-ex);
+            font-weight: bold;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .btn-note {
+            background: white;
+            border: 2px solid var(--primary-ex);
+            color: var(--primary-ex);
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            flex: 1;
+            min-width: 50px;
+        }
+
+        .btn-note:hover { background: var(--primary-ex); color: white; }
+        .btn-note.correct { background: #00cec9 !important; border-color: #00cec9 !important; color: white !important; }
+        .btn-note.wrong { background: #ff7675 !important; border-color: #ff7675 !important; color: white !important; }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="img/logo-trans-zuria.png" alt="Erandioko Musika Eskola Logo">
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="asignaturas.html">Asignaturas</a>
+                <a href="profesorado.html">Profesorado</a>
+                <a href="ejercicios.html" class="active">Ejercicios</a>
+                <a href="calendario.html">Calendario</a>
+                <a href="matricula.html">Matrícula</a>
+                <a href="contacto.html">Contacto</a>
+                <div class="lang-selector">
+                    <a href="ejercicios.html" class="active">ES</a>
+                    <span>|</span>
+                    <a href="ejercicios-eu.html">EU</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="exercises-container">
+        <div class="app-container">
+            <div class="header-ex">
+                <h1>Ritmo y Lectura</h1>
+                <p>Entrena tu lectura musical y sentido del ritmo interactivo</p>
+            </div>
+
+            <div class="tabs-ex">
+                <button class="tab-btn active" onclick="switchTab('ritmo', this)">1. Secuencias Rítmicas</button>
+                <button class="tab-btn" onclick="switchTab('quien', this)">2. ¿Quién Suena?</button>
+            </div>
+
+            <!-- VISTA DE RITMO -->
+            <div id="view-ritmo" class="view-ex active">
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Clave</label>
+                        <select id="clef">
+                            <option value="treble">Sol (Treble)</option>
+                            <option value="bass">Fa (Bass)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Compás</label>
+                        <select id="timeSig">
+                            <option value="4/4">4/4</option>
+                            <option value="3/4">3/4</option>
+                            <option value="2/4">2/4</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Figuras</label>
+                        <details class="checkbox-group" id="noteTypeGroup">
+                            <summary>Elegir figuras...</summary>
+                            <div class="dropdown-content">
+                                <label class="cb-label"><input type="checkbox" value="1/4" checked> Negras</label>
+                                <label class="cb-label"><input type="checkbox" value="1/8"> Corcheas</label>
+                                <label class="cb-label"><input type="checkbox" value="1/16"> Semicorcheas</label>
+                                <label class="cb-label"><input type="checkbox" value="rest"> Silencios</label>
+                            </div>
+                        </details>
+                    </div>
+                    <div class="control-group">
+                        <label>Instrumento</label>
+                        <select id="instrument">
+                            <option value="0">Piano</option>
+                            <option value="24">Guitarra</option>
+                            <option value="40">Violín</option>
+                            <option value="42">Cello</option>
+                            <option value="65">Saxo</option>
+                            <option value="73">Flauta</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>BPM</label>
+                        <input type="number" id="bpm" value="60" min="40" max="200">
+                    </div>
+                    <div class="control-group">
+                        <label>Nº Compases</label>
+                        <input type="number" id="numMeasures" value="4" min="1" max="32">
+                    </div>
+                    <div class="control-group">
+                        <label>Chivato</label>
+                        <select id="showNoteNames">
+                            <option value="yes">Activado</option>
+                            <option value="no" selected>Desactivado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn-generate" onclick="generateExercise()">Generar Partitura</button>
+                <div id="statusMessage" style="text-align:center; color: var(--text-light-ex);">Ajusta los parámetros y ¡genera una partitura!</div>
+                
+                <div class="audio-wrapper hidden" id="audioContainer">
+                    <div id="audio"></div>
+                </div>
+
+                <div class="score-container">
+                    <div id="paper"></div>
+                </div>
+                
+                <div id="piano-wrapper" class="piano-wrapper">
+                    <div id="piano-container" style="position:relative;"></div>
+                </div>
+            </div>
+
+            <!-- VISTA DE QUIÉN SUENA -->
+            <div id="view-quien" class="view-ex">
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Clave</label>
+                        <select id="quien-clef">
+                            <option value="treble">Sol (Treble)</option>
+                            <option value="bass">Fa (Bass)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Nº Compases</label>
+                        <input type="number" id="quien-numMeasures" value="4" min="1" max="16">
+                    </div>
+                </div>
+
+                <button class="btn-generate" onclick="generateQuiz()">Generar Práctica</button>
+                
+                <div class="score-container">
+                    <div id="quien-paper"></div>
+                </div>
+
+                <div id="quien-hint" style="text-align:center; font-size:1.5rem; color:var(--primary-ex); min-height:40px;"></div>
+
+                <div class="stats-panel">
+                    Puntuación: <span id="quien-score">0</span> | Racha: <span id="quien-streak">0🔥</span>
+                </div>
+
+                <div style="display:flex; justify-content:center; gap: 8px; flex-wrap:wrap;">
+                    <button class="btn-note" onclick="guessNote('Do', this)">Do</button>
+                    <button class="btn-note" onclick="guessNote('Re', this)">Re</button>
+                    <button class="btn-note" onclick="guessNote('Mi', this)">Mi</button>
+                    <button class="btn-note" onclick="guessNote('Fa', this)">Fa</button>
+                    <button class="btn-note" onclick="guessNote('Sol', this)">Sol</button>
+                    <button class="btn-note" onclick="guessNote('La', this)">La</button>
+                    <button class="btn-note" onclick="guessNote('Si', this)">Si</button>
+                    <button class="btn-note" onclick="guessNote('Silencio', this)">🤫</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p class="copyright">&copy; 2026 Erandioko Musika Eskola</p>
+    </footer>
+
+    <script>
+        // Lógica de la aplicación (copiada y adaptada)
+        let visualObj = null;
+        let synthControl = new ABCJS.synth.SynthController();
+        const notesTreble = ['C', 'D', 'E', 'F', 'G', 'A', 'B', 'c', 'd', 'e', 'f', 'g'];
+        const notesBass = ['C,', 'D,', 'E,', 'F,', 'G,', 'A,', 'B,', 'C', 'D', 'E', 'F'];
+
+        function midiToSolfege(pitch) {
+            const solfege = ["Do", "Do#", "Re", "Re#", "Mi", "Fa", "Fa#", "Sol", "Sol#", "La", "La#", "Si"];
+            return solfege[pitch % 12] || "";
+        }
+
+        function playTone(pitch) {
+            let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            let freq = 440 * Math.pow(2, (pitch - 69) / 12);
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = "sine";
+            osc.frequency.value = freq;
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.6, audioCtx.currentTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 1.5);
+        }
+
+        function CursorControl() {
+            this.onStart = function() {
+                document.querySelectorAll('#paper .abcjs-note, #paper .abcjs-rest').forEach(n => n.classList.remove("quiz-target"));
+            };
+            this.onEvent = function(ev) {
+                document.querySelectorAll('#paper .abcjs-note, #paper .abcjs-rest').forEach(n => n.classList.remove("quiz-target")); 
+                if (!ev || !ev.elements || ev.elements.length === 0) return;
+                ev.elements.forEach(nodeGroup => {
+                    let element = Array.isArray(nodeGroup) ? nodeGroup[0] : nodeGroup;
+                    let g = element.closest ? element.closest('.abcjs-note, .abcjs-rest') : null;
+                    if (g) g.classList.add("quiz-target");
+                });
+                
+                let keys = document.querySelectorAll('.piano-key, .inst-note, .wind-hole');
+                keys.forEach(k => k.classList.remove('active'));
+                let instr = document.getElementById('instrument').value;
+                if (ev.midiPitches && ev.midiPitches.length > 0) {
+                    let pitch = ev.midiPitches[0].pitch;
+                    if (instr === "65" || instr === "73") {
+                        let closedKeys = (pitch % 8) + 1;
+                        for(let i=0; i<closedKeys; i++) {
+                            let h = document.getElementById(`wind-hole-${i}`);
+                            if(h) h.classList.add('active');
+                        }
+                    } else {
+                        document.querySelectorAll(`.piano-key[data-pitch='${pitch}'], .inst-note[data-pitch='${pitch}']`).forEach(k => k.classList.add('active'));
+                    }
+                }
+            };
+            this.onFinished = function() {
+                document.querySelectorAll('#paper .abcjs-note, #paper .abcjs-rest').forEach(n => n.classList.remove("quiz-target")); 
+                document.querySelectorAll('.piano-key, .inst-note, .wind-hole').forEach(k => k.classList.remove('active'));
+            };
+        }
+
+        function drawInstrument(instId) {
+            const container = document.getElementById('piano-container');
+            container.innerHTML = '';
+            if (instId === "0") {
+                container.style.display = 'flex';
+                for(let i = 48; i <= 83; i++) {
+                    const isBlack = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0][i % 12];
+                    if(!isBlack) {
+                        let wk = document.createElement('div');
+                        wk.className = 'piano-key white-key';
+                        wk.dataset.pitch = i;
+                        container.appendChild(wk);
+                    }
+                }
+                let currentWhite = 0;
+                for(let i = 48; i <= 83; i++) {
+                    const isBlack = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0][i % 12];
+                    if(isBlack) {
+                        let bk = document.createElement('div');
+                        bk.className = 'piano-key black-key';
+                        bk.dataset.pitch = i;
+                        bk.style.left = (currentWhite * 36 - 12) + 'px';
+                        container.appendChild(bk);
+                    } else { currentWhite++; }
+                }
+            } else if (instId === "24") {
+                container.innerHTML = '<div class="guitar-fretboard" id="guitar-board"></div>';
+                const board = document.getElementById('guitar-board');
+                for(let i=1; i<=15; i++) {
+                    let fret = document.createElement('div');
+                    fret.className = 'guitar-fret';
+                    fret.style.left = `${(i/15)*100}%`;
+                    fret.style.position = 'absolute';
+                    fret.style.width = '2px';
+                    fret.style.height = '100%';
+                    fret.style.background = '#bdc3c7';
+                    board.appendChild(fret);
+                }
+                const strings = [64, 59, 55, 50, 45, 40];
+                for(let s=0; s<6; s++) {
+                    let stringDiv = document.createElement('div');
+                    stringDiv.className = 'guitar-string';
+                    stringDiv.style.top = `${(s+1) * 25}px`;
+                    stringDiv.style.height = '2px';
+                    board.appendChild(stringDiv);
+                    for(let f=0; f<=15; f++) {
+                        let dot = document.createElement('div');
+                        dot.className = 'string-note-dot inst-note';
+                        dot.dataset.pitch = strings[s] + f;
+                        dot.style.top = `${(s+1) * 25}px`;
+                        dot.style.left = `${(f/15)*100}%`;
+                        board.appendChild(dot);
+                    }
+                }
+            } else if (instId === "65" || instId === "73") {
+                container.innerHTML = `<div class="wind-instrument ${instId === "65" ? 'saxo' : 'flute'}" id="wind-board"></div>`;
+                const board = document.getElementById('wind-board');
+                for(let i=0; i<8; i++) {
+                    let hole = document.createElement('div');
+                    hole.className = 'wind-hole';
+                    hole.id = `wind-hole-${i}`;
+                    board.appendChild(hole);
+                }
+            }
+        }
+
+        function generateExercise() {
+            const clef = document.getElementById('clef').value;
+            const timeSig = document.getElementById('timeSig').value;
+            const bpm = document.getElementById('bpm').value;
+            const instrumentId = document.getElementById('instrument').value;
+            let typesNodes = document.querySelectorAll('#noteTypeGroup input[type="checkbox"]:checked:not([value="rest"])');
+            let selectedTypes = Array.from(typesNodes).map(n => n.value);
+            if (selectedTypes.length === 0) selectedTypes = ['1/4'];
+            let useRests = document.querySelector('#noteTypeGroup input[value="rest"]').checked;
+
+            let abcString = `X: 1\nM: ${timeSig}\nL: 1/4\nQ: 1/4=${bpm}\nK: C clef=${clef}\n`;
+            const pool = clef === 'treble' ? notesTreble : notesBass;
+            const beats = parseInt(timeSig.split('/')[0]);
+            
+            const numMeasures = parseInt(document.getElementById('numMeasures').value) || 4;
+            
+            for (let i = 0; i < numMeasures; i++) {
+                let m = "";
+                for (let b = 0; b < beats; b++) {
+                    let beatType = selectedTypes[Math.floor(Math.random() * selectedTypes.length)];
+                    let notesCount = beatType === '1/4' ? 1 : (beatType === '1/8' ? 2 : 4);
+                    let suffix = beatType === '1/4' ? "" : (beatType === '1/8' ? "/2" : "/4");
+                    for(let n=0; n < notesCount; n++) {
+                        let isRest = useRests && (Math.random() < 0.2);
+                        m += (isRest ? "z" : pool[Math.floor(Math.random() * pool.length)]) + suffix;
+                    }
+                    m += " ";
+                }
+                abcString += m + ((i + 1) % 4 === 0 ? " |\n" : " | ");
+            }
+            abcString = abcString.trim().replace(/\|$/, " |]");
+
+            document.getElementById('piano-wrapper').style.display = "flex";
+            drawInstrument(instrumentId);
+            visualObj = ABCJS.renderAbc("paper", abcString, { responsive: "resize", add_classes: true })[0];
+            
+            document.getElementById('audio').innerHTML = "";
+            synthControl = new ABCJS.synth.SynthController();
+            synthControl.load("#audio", new CursorControl(), { displayPlay: true, displayRestart: true });
+            synthControl.setTune(visualObj, false, {
+                program: parseInt(instrumentId),
+                qpm: parseInt(bpm),
+                soundFontUrl: "https://paulrosen.github.io/midi-js-soundfonts/FluidR3_GM/"
+            }).then(() => document.getElementById('audioContainer').classList.remove('hidden'));
+        }
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.view-ex').forEach(v => v.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('view-' + tabId).classList.add('active');
+        }
+
+        let quizSequence = [];
+        let currentQuizIndex = 0;
+        let quizCurrentPitch = null;
+        let quizScore = 0;
+        let quizStreak = 0;
+
+        function generateQuiz() {
+            const clef = document.getElementById('quien-clef').value;
+            const pool = clef === 'treble' ? notesTreble : notesBass;
+            let abcString = `X: 1\nM: 4/4\nL: 1/4\nK: C clef=${clef}\n`;
+            quizSequence = [];
+            for (let i = 0; i < 4; i++) {
+                let m = "";
+                for (let b = 0; b < 4; b++) {
+                    let isRest = Math.random() < 0.15;
+                    let rawNote = isRest ? "z" : pool[Math.floor(Math.random() * pool.length)];
+                    m += rawNote + " ";
+                    if (isRest) quizSequence.push("Silencio");
+                    else {
+                        let noteBase = rawNote.replace(/[,']/g, "").toUpperCase();
+                        quizSequence.push({ "C": "Do", "D": "Re", "E": "Mi", "F": "Fa", "G": "Sol", "A": "La", "B": "Si" }[noteBase]);
+                    }
+                }
+                abcString += m + (i === 3 ? " |]" : " | ");
+            }
+            ABCJS.renderAbc("quien-paper", abcString, { responsive: "resize", add_classes: true });
+            quizScore = 0; quizStreak = 0; currentQuizIndex = 0;
+            updateQuizStats();
+            highlightNextQuizNote();
+        }
+
+        function highlightNextQuizNote() {
+            let svgs = document.querySelectorAll('#quien-paper .abcjs-note, #quien-paper .abcjs-rest');
+            svgs.forEach(n => n.classList.remove("quiz-target"));
+            if (currentQuizIndex < svgs.length) {
+                svgs[currentQuizIndex].classList.add("quiz-target");
+                quizCurrentPitch = quizSequence[currentQuizIndex];
+            } else {
+                quizCurrentPitch = null;
+                alert("¡Ejercicio completado! Puntuación final: " + quizScore);
+            }
+        }
+
+        function guessNote(noteName, btn) {
+            if (!quizCurrentPitch) return;
+            if (noteName === quizCurrentPitch) {
+                quizScore += 10; quizStreak++;
+                btn.classList.add("correct");
+            } else {
+                quizStreak = 0;
+                btn.classList.add("wrong");
+                document.querySelectorAll('#quien-paper .abcjs-note, #quien-paper .abcjs-rest')[currentQuizIndex].classList.add("quiz-error");
+            }
+            currentQuizIndex++;
+            updateQuizStats();
+            setTimeout(() => {
+                btn.classList.remove("correct", "wrong");
+                highlightNextQuizNote();
+            }, 300);
+        }
+
+        function updateQuizStats() {
+            document.getElementById("quien-score").innerText = quizScore;
+            document.getElementById("quien-streak").innerText = quizStreak + "🔥";
+        }
+    </script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

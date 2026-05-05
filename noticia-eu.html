@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erandioko Musika Eskola | Noticia</title>
+    <meta name="description" content="Bienvenid@ a la Escuela de Música de Erandio. Tu punto de encuentro para el aprendizaje musical, instrumentos y cultura.">
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="index-eu.html" class="logo">
+                <img src="img/logo-trans-zuria.png" alt="Erandioko Musika Eskola Logo">
+            </a>
+            <nav class="nav-links">
+                <a href="index-eu.html" class="active">Hasiera</a>
+                <a href="asignaturas-eu.html">Ikasgaiak</a>
+                <a href="profesorado-eu.html">Irakasleak</a>
+                <a href="ejercicios-eu.html">Ariketak</a>
+                <a href="calendario-eu.html">Egutegia</a>
+                <a href="matricula-eu.html">Matrikula</a>
+                <a href="contacto-eu.html">Kontaktua</a>
+                <div class="lang-selector">
+                    <a href="index.html">ES</a>
+                    <span>|</span>
+                    <a href="index-eu.html"class="active">EU</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="hero">
+        <video autoplay muted loop playsinline class="video-bg">
+            <source src="img/MusikaEskolaSoinurikEZ.mp4" type="video/mp4">
+        </video>
+        <div class="hero-overlay"></div>
+        <h1>Ongi etorri Erandioko Musika Eskolara</h1>
+        <p>Zure prestakuntza musikalaren, kultura eta artearen topagunea Erandion.</p>
+    </div>
+
+    <main style="padding: 4rem 2rem; min-height: 60vh;"><div id="news-detail-container"></div></main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-col">
+                <h3>Kontaktua</h3>
+                <p>94 467 05 11 – 94 467 34 61</p>
+                <p>smeskola@erandio.eus</p>
+                <p>Erandio, Bizkaia</p>
+            </div>
+            <div class="footer-col">
+                <h3>Lotura Kirolak</h3>
+                <ul>
+                    <li><a href="asignaturas-eu.html">Ikasgaiak eta Instrumentuak</a></li>
+                    <li><a href="profesorado-eu.html">Gure Irakasleak</a></li>
+                    <li><a href="calendario-eu.html">Eskola Egutegia</a></li>
+                    <li><a href="backoffice.html">Administrazioa</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Ohar Legalak</h3>
+                <ul>
+                    <li><a href="#">Pribatutasun Politika</a></li>
+                    <li><a href="#">Cookie Politika</a></li>
+                </ul>
+            </div>
+        </div>
+        <p class="copyright">&copy; 2026 Erandioko Musika Eskola - Ayuntamiento de Erandio Udala</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
