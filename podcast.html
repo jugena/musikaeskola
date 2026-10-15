@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcast | Erandioko Musika Eskola</title>
+    <meta name="description" content="Escucha los podcast de Erandioko Musika Eskola: conversaciones, música, aprendizaje y vida de la escuela.">
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="podcast-page">
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo"><img src="img/logo-trans-zuria.png" alt="Erandioko Musika Eskola"></a>
+            <nav class="nav-links" aria-label="Navegación principal">
+                <a href="index.html">Inicio</a><a href="asignaturas.html">Asignaturas</a><a href="profesorado.html">Profesorado</a><a href="ejercicios.html">Ejercicios</a><a href="calendario.html">Calendario</a><a href="podcast.html" class="active">Podcast</a><a href="matricula.html">Matrícula</a><a href="contacto.html">Contacto</a>
+                <div class="lang-selector"><a href="podcast.html" class="active">ES</a><span>|</span><a href="podcast-eu.html">EU</a></div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="podcast-main">
+        <section class="podcast-hero">
+            <div class="podcast-hero-copy"><span class="podcast-kicker">Erandioko Musika Eskola · En antena</span><h1>La escuela también se escucha</h1><p>Conversaciones, interpretación, historias y aprendizaje musical desde Erandio.</p></div>
+            <div class="podcast-wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        </section>
+
+        <section id="podcast-featured" class="podcast-featured" aria-live="polite">
+            <div id="podcast-featured-cover" class="podcast-featured-cover"><span aria-hidden="true">♪</span></div>
+            <div class="podcast-player-copy">
+                <span class="podcast-kicker">Escuchar ahora</span>
+                <h2 id="podcast-featured-title">Próximamente, el primer episodio</h2>
+                <p id="podcast-featured-description">Aquí podrás escuchar los nuevos podcast de la Musika Eskola.</p>
+                <div id="podcast-featured-keywords" class="podcast-tags"></div>
+                <audio id="podcast-featured-audio" controls preload="metadata" aria-label="Reproductor del episodio seleccionado"></audio>
+            </div>
+        </section>
+
+        <section class="podcast-catalogue" aria-labelledby="podcast-list-title">
+            <div class="podcast-section-heading"><div><span class="podcast-kicker">Todos los programas</span><h2 id="podcast-list-title">Episodios</h2></div><label class="podcast-search"><span>Buscar</span><input id="podcast-search" type="search" placeholder="Título, tema o palabra clave…"></label></div>
+            <div id="podcast-grid" class="podcast-grid"><p class="podcast-empty">Cargando episodios…</p></div>
+        </section>
+    </main>
+
+    <footer><div class="footer-container"><div class="footer-col"><h3>Contacto</h3><p>94 467 05 11 – 94 467 34 61</p><p>smeskola@erandio.eus</p><p>Erandio, Bizkaia</p></div><div class="footer-col"><h3>Enlaces rápidos</h3><ul><li><a href="asignaturas.html">Asignaturas e instrumentos</a></li><li><a href="calendario.html">Calendario escolar</a></li><li><a href="backoffice.html">Administración</a></li></ul></div></div><p class="copyright">&copy; 2026 Erandioko Musika Eskola - Ayuntamiento de Erandio Udala</p></footer>
+    <script src="script.js"></script>
+</body>
+</html>

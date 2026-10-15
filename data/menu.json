@@ -1,0 +1,10 @@
+{
+    "home": true,
+    "subjects": true,
+    "teachers": true,
+    "exercises": true,
+    "calendar": true,
+    "podcasts": true,
+    "enrollment": true,
+    "contact": true
+}

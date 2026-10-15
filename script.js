@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    let quillEs, quillEu, quillEventEs, quillEventEu;
-    if (document.getElementById('editor-es')) {
+    let quillEs, quillEu, quillEventEs, quillEventEu, quillPostEs, quillPostEu;
+    if (typeof Quill !== 'undefined' && document.getElementById('editor-es')) {
         const toolbarOptions = [
             ['bold', 'italic', 'underline', 'strike'],
             [{ 'header': [1, 2, 3, false] }],
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         quillEs = new Quill('#editor-es', { theme: 'snow', modules: { toolbar: toolbarOptions } });
         quillEu = new Quill('#editor-eu', { theme: 'snow', modules: { toolbar: toolbarOptions } });
     }
-    if (document.getElementById('event-editor-es')) {
+    if (typeof Quill !== 'undefined' && document.getElementById('event-editor-es')) {
         const toolbarOptions = [
             ['bold', 'italic', 'underline', 'strike'],
             [{ 'header': [1, 2, 3, false] }],
@@ -22,6 +22,17 @@ document.addEventListener('DOMContentLoaded', () => {
         quillEventEs = new Quill('#event-editor-es', { theme: 'snow', modules: { toolbar: toolbarOptions } });
         quillEventEu = new Quill('#event-editor-eu', { theme: 'snow', modules: { toolbar: toolbarOptions } });
     }
+    if (typeof Quill !== 'undefined' && document.getElementById('post-editor-es')) {
+        const toolbarOptions = [
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'header': [1, 2, 3, false] }],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['link', 'image', 'video'],
+            ['clean']
+        ];
+        quillPostEs = new Quill('#post-editor-es', { theme: 'snow', modules: { toolbar: toolbarOptions } });
+        quillPostEu = new Quill('#post-editor-eu', { theme: 'snow', modules: { toolbar: toolbarOptions } });
+    }
 
     // Detect language and containers
     const lang = document.documentElement.lang || 'es';
@@ -29,7 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
         news: document.getElementById('news-grid-dynamic'),
         subjects: document.getElementById('subjects-grid-dynamic'),
         teachers: document.getElementById('teachers-grid-dynamic'),
-        calendar: document.getElementById('calendar-view')
+        calendar: document.getElementById('calendar-view'),
+        podcasts: document.getElementById('podcast-grid')
     };
 
     // Forms
@@ -37,7 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
         news: document.getElementById('news-form'),
         subjects: document.getElementById('subjects-form'),
         teachers: document.getElementById('teachers-form'),
-        events: document.getElementById('events-form')
+        events: document.getElementById('events-form'),
+        posts: document.getElementById('posts-form'),
+        podcasts: document.getElementById('podcasts-form')
     };
 
     // Table Bodies
@@ -45,71 +59,117 @@ document.addEventListener('DOMContentLoaded', () => {
         news: document.getElementById('admin-news-body'),
         subjects: document.getElementById('admin-subjects-body'),
         teachers: document.getElementById('admin-teachers-body'),
-        events: document.getElementById('admin-events-body')
+        events: document.getElementById('admin-events-body'),
+        posts: document.getElementById('admin-posts-body'),
+        podcasts: document.getElementById('admin-podcasts-body')
     };
 
-    // FIREBASE INITIALIZATION
-    const firebaseConfig = {
-        apiKey: "AIzaSyBfkQkidwrsc7zyUcPhN0UL2wSxZoDr9Ac",
-        authDomain: "musika-eskola-ecce1.firebaseapp.com",
-        databaseURL: "https://musika-eskola-ecce1-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "musika-eskola-ecce1",
-        storageBucket: "musika-eskola-ecce1.firebasestorage.app",
-        messagingSenderId: "324451594740",
-        appId: "1:324451594740:web:77b5a943b9bb21505b89a1"
+    const CONTENT_API = 'api/content.php';
+    const loadedCollections = new Set();
+    const revisions = {};
+
+    const fetchCollection = async (collection) => {
+        const response = await fetch(`${CONTENT_API}?collection=${encodeURIComponent(collection)}${document.body.classList.contains('admin-page') ? '&admin=1' : ''}`, {
+            credentials: 'same-origin',
+            cache: 'no-store'
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || !payload.ok) throw new Error(payload.error || `HTTP ${response.status}`);
+        loadedCollections.add(collection);
+        revisions[collection] = payload.revision;
+        return payload.data;
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+
+    const persistCollection = async (collection, data) => {
+        if (!loadedCollections.has(collection)) throw new Error('collection_not_loaded');
+        const response = await fetch(`${CONTENT_API}?collection=${encodeURIComponent(collection)}`, {
+            method: 'PUT',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data, revision: revisions[collection] })
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || !payload.ok) throw new Error(payload.error || `HTTP ${response.status}`);
+        revisions[collection] = payload.revision;
+        return payload.data;
+    };
+
+    const showAdminNotice = (message, isError = false) => {
+        if (!document.body.classList.contains('admin-page')) return;
+        let notice = document.getElementById('admin-global-notice');
+        if (!notice) {
+            notice = document.createElement('div');
+            notice.id = 'admin-global-notice';
+            notice.setAttribute('role', 'status');
+            notice.setAttribute('aria-live', 'polite');
+            document.body.appendChild(notice);
+        }
+        notice.className = `admin-global-notice ${isError ? 'is-error' : 'is-success'}`;
+        notice.textContent = message;
+        notice.hidden = false;
+        window.clearTimeout(showAdminNotice.timeoutId);
+        showAdminNotice.timeoutId = window.setTimeout(() => { notice.hidden = true; }, 6000);
+    };
 
     // DATA INITIALIZATION
     let news = [];
     let subjects = [];
     let teachers = [];
     let events = [];
+    let posts = [];
+    let podcasts = [];
     let nonTeachingDays = []; // Formato: ['YYYY-MM-DD', ...]
     let subjectFilter = '';
     let teacherFilter = '';
+    let podcastFilter = '';
+    let selectedPodcastId = null;
     let menuState = {
-        home: true, subjects: true, teachers: true, exercises: true, calendar: true, enrollment: true, contact: true
+        home: true, subjects: true, teachers: true, exercises: true, calendar: true, podcasts: true, enrollment: true, contact: true
     };
 
-    db.ref('musika_news').on('value', (snapshot) => {
-        let val = snapshot.val();
-        news = val ? (Array.isArray(val) ? val : Object.values(val)).filter(Boolean) : [];
-        renderNews();
-    });
+    let loadGeneration = 0;
+    const loadAllContent = async () => {
+        const generation = ++loadGeneration;
+        try {
+            const results = await Promise.allSettled([
+                fetchCollection('news'), fetchCollection('subjects'), fetchCollection('teachers'), fetchCollection('events'),
+                fetchCollection('posts'), fetchCollection('podcasts'), fetchCollection('menu'), fetchCollection('calendar')
+            ]);
+            if (generation !== loadGeneration) return;
+            const [newsData, subjectsData, teachersData, eventsData, postsData, podcastsData, menuData, calendarData] = results.map(result => result.status === 'fulfilled' ? result.value : undefined);
+            if (results.some(result => result.status === 'rejected')) {
+                showAdminNotice(lang === 'eu' ? 'Datu batzuk ezin izan dira kargatu. Kargatu berriro orria.' : 'Algunos datos no se han podido cargar. Recarga la página antes de editarlos.', true);
+            }
+            news = Array.isArray(newsData) ? newsData.filter(Boolean) : [];
+            subjects = Array.isArray(subjectsData) ? subjectsData.filter(Boolean) : [];
+            teachers = Array.isArray(teachersData) ? teachersData.filter(Boolean) : [];
+            events = Array.isArray(eventsData) ? eventsData.filter(Boolean) : [];
+            posts = Array.isArray(postsData) ? postsData.filter(Boolean) : [];
+            podcasts = Array.isArray(podcastsData) ? podcastsData.filter(Boolean) : [];
+            if (menuData && typeof menuData === 'object') menuState = { ...menuState, ...menuData };
+            nonTeachingDays = Array.isArray(calendarData?.nonTeachingDays) ? calendarData.nonTeachingDays : [];
 
-    db.ref('musika_subjects').on('value', (snapshot) => {
-        let val = snapshot.val();
-        subjects = val ? (Array.isArray(val) ? val : Object.values(val)).filter(Boolean) : [];
-        renderSubjects();
-    });
-
-    db.ref('musika_teachers').on('value', (snapshot) => {
-        let val = snapshot.val();
-        teachers = val ? (Array.isArray(val) ? val : Object.values(val)).filter(Boolean) : [];
-        renderTeachers();
-    });
-
-    db.ref('musika_events').on('value', (snapshot) => {
-        let val = snapshot.val();
-        events = val ? (Array.isArray(val) ? val : Object.values(val)).filter(Boolean) : [];
-        renderEvents();
-        if (containers.calendar) renderCalendar();
-    });
-
-    db.ref('musika_menu').on('value', (snapshot) => {
-        let val = snapshot.val();
-        if (val) menuState = val;
-        renderMenuAdmin();
-        applyMenuState();
-    });
-
-    db.ref('musika_calendar_config').on('value', (snapshot) => {
-        let val = snapshot.val();
-        nonTeachingDays = val && val.nonTeachingDays ? val.nonTeachingDays : [];
-        if (containers.calendar) renderCalendar();
-    });
+            renderNews();
+            renderSubjects();
+            renderTeachers();
+            renderEvents();
+            renderPosts();
+            renderPodcasts();
+            renderPodcastPublic();
+            if (containers.podcasts && results[5].status === 'rejected') {
+                containers.podcasts.textContent = lang === 'eu' ? 'Ezin izan dira podcastak kargatu. Saiatu berriro.' : 'No se han podido cargar los podcasts. Inténtalo de nuevo.';
+            }
+            renderMenuAdmin();
+            applyMenuState();
+            if (containers.calendar) renderCalendar();
+            renderNewsDetail();
+        } catch (error) {
+            console.error('No se han podido cargar los archivos JSON', error);
+            showAdminNotice(lang === 'eu'
+                ? 'Ezin izan dira JSON datuak kargatu. Ireki webgunea PHP zerbitzari baten bidez.'
+                : 'No se han podido cargar los datos JSON. Abre la web mediante un servidor PHP.', true);
+        }
+    };
 
     const applyMenuState = () => {
         const toggleLink = (hrefs, isVisible) => {
@@ -124,10 +184,99 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleLink(['profesorado.html', 'profesorado-eu.html'], menuState.teachers);
         toggleLink(['ejercicios.html', 'ejercicios-eu.html'], menuState.exercises);
         toggleLink(['calendario.html', 'calendario-eu.html'], menuState.calendar);
+        toggleLink(['podcast.html', 'podcast-eu.html'], menuState.podcasts);
         toggleLink(['matricula.html', 'matricula-eu.html', 'matricula-bilingue.html'], menuState.enrollment);
         toggleLink(['contacto.html', 'contacto-eu.html'], menuState.contact);
     };
     applyMenuState();
+
+    const translateText = async (text, from, to) => {
+        const cleanText = (text || '').trim();
+        if (!cleanText) return '';
+
+        const chunks = [];
+        let remaining = cleanText;
+        while (remaining.length > 450) {
+            let cut = remaining.lastIndexOf(' ', 450);
+            if (cut < 200) cut = 450;
+            chunks.push(remaining.slice(0, cut));
+            remaining = remaining.slice(cut).trimStart();
+        }
+        if (remaining) chunks.push(remaining);
+
+        const translated = [];
+        for (const chunk of chunks) {
+            const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(chunk)}&langpair=${from}|${to}`);
+            if (!response.ok) throw new Error(`Translation request failed: ${response.status}`);
+            const payload = await response.json();
+            if (!payload.responseData || typeof payload.responseData.translatedText !== 'string') {
+                throw new Error('Unexpected translation response');
+            }
+            translated.push(payload.responseData.translatedText);
+        }
+        return translated.join(' ');
+    };
+
+    const translationFields = {
+        news: {
+            fields: [['news-title-eu', 'news-title'], ['news-summary-eu', 'news-summary']],
+            editors: { eu: () => quillEu, es: () => quillEs }
+        },
+        subjects: { fields: [['subject-name-eu', 'subject-name']] },
+        teachers: { fields: [['teacher-instrument-eu', 'teacher-instrument'], ['teacher-tutoring-eu', 'teacher-tutoring']] },
+        events: {
+            fields: [['event-title-eu', 'event-title'], ['event-type-eu', 'event-type'], ['event-summary-eu', 'event-summary']],
+            editors: { eu: () => quillEventEu, es: () => quillEventEs }
+        },
+        posts: {
+            fields: [['post-title-eu', 'post-title'], ['post-summary-eu', 'post-summary']],
+            editors: { eu: () => quillPostEu, es: () => quillPostEs }
+        },
+        podcasts: {
+            fields: [
+                ['podcast-title-eu', 'podcast-title'],
+                ['podcast-description-eu', 'podcast-description'],
+                ['podcast-keywords-eu', 'podcast-keywords']
+            ]
+        }
+    };
+
+    window.translateSection = async (section, from, to, button) => {
+        const config = translationFields[section];
+        if (!config) return;
+        const sourceIndex = from === 'eu' ? 0 : 1;
+        const targetIndex = to === 'eu' ? 0 : 1;
+        const hasTextField = config.fields.some(pair => document.getElementById(pair[sourceIndex])?.value.trim());
+        const sourceEditor = config.editors?.[from]?.();
+        const hasEditorText = sourceEditor && sourceEditor.getText().trim();
+
+        if (!hasTextField && !hasEditorText) {
+            alert(lang === 'eu' ? 'Idatzi itzuli beharreko edukia lehenengo.' : 'Escribe primero el contenido que quieres traducir.');
+            return;
+        }
+
+        const originalLabel = button.innerHTML;
+        button.disabled = true;
+        button.textContent = lang === 'eu' ? 'Itzultzen…' : 'Traduciendo…';
+        try {
+            for (const pair of config.fields) {
+                const source = document.getElementById(pair[sourceIndex]);
+                const target = document.getElementById(pair[targetIndex]);
+                if (source && target && source.value.trim()) target.value = await translateText(source.value, from, to);
+            }
+            if (sourceEditor && hasEditorText) {
+                const targetEditor = config.editors[to]();
+                targetEditor.setText(await translateText(sourceEditor.getText(), from, to));
+            }
+            alert(lang === 'eu' ? 'Itzulpena osatu da. Berrikusi emaitza gorde aurretik.' : 'Traducción completada. Revisa el resultado antes de guardar.');
+        } catch (error) {
+            console.error('Automatic translation failed', error);
+            alert(lang === 'eu' ? 'Ezin izan da itzulpena osatu. Saiatu berriro.' : 'No se ha podido completar la traducción. Inténtalo de nuevo.');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalLabel;
+        }
+    };
 
     // RENDERING FUNCTIONS
     const renderNews = () => {
@@ -245,6 +394,10 @@ document.addEventListener('DOMContentLoaded', () => {
             teacherFilter = e.target.value;
             renderTeachers();
         }
+        if (e.target.id === 'podcast-search') {
+            podcastFilter = e.target.value;
+            renderPodcastPublic();
+        }
     });
 
     const renderEvents = () => {
@@ -270,6 +423,147 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const renderPosts = () => {
+        if (!tables.posts) return;
+        const sortedPosts = [...posts].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        tables.posts.innerHTML = sortedPosts.map(post => `
+            <tr>
+                <td>${post.date || '-'}</td>
+                <td>${lang === 'eu' ? (post.title_eu || post.title) : post.title}</td>
+                <td>${post.published ? (lang === 'eu' ? 'Argitaratuta' : 'Publicada') : (lang === 'eu' ? 'Zirriborroa' : 'Borrador')}</td>
+                <td>
+                    <button class="btn btn-primary" onclick="editPost('${post.id}')">${lang === 'eu' ? 'Editatu' : 'Editar'}</button>
+                    <button class="btn btn-danger" onclick="deleteItem('posts', '${post.id}')">${lang === 'eu' ? 'Ezabatu' : 'Borrar'}</button>
+                </td>
+            </tr>
+        `).join('') || `<tr><td colspan="4">${lang === 'eu' ? 'Oraindik ez dago sarrerarik.' : 'Todavía no hay entradas.'}</td></tr>`;
+    };
+
+    const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[char]));
+
+    const safeMediaUrl = (value = '') => {
+        const trimmed = String(value).trim();
+        if (!trimmed) return '';
+
+        if (trimmed.includes('\\') || /[\u0000-\u001f\u007f]/.test(trimmed)) return '';
+        if (!/^[a-z][a-z\d+.-]*:/i.test(trimmed) && !trimmed.startsWith('//') && !trimmed.includes('\\')) {
+            try {
+                return new URL(trimmed, window.location.href).href.replace(/'/g, '%27').replace(/"/g, '%22');
+            } catch (_) {
+                return '';
+            }
+        }
+
+        try {
+            const parsed = new URL(trimmed);
+            return ['http:', 'https:'].includes(parsed.protocol)
+                ? parsed.href.replace(/'/g, '%27').replace(/"/g, '%22')
+                : '';
+        } catch (_) {
+            return '';
+        }
+    };
+
+    const isMp3Url = (value = '') => {
+        const safeUrl = safeMediaUrl(value);
+        if (!safeUrl) return false;
+        try {
+            return new URL(safeUrl, 'https://local.invalid/').pathname.toLowerCase().endsWith('.mp3');
+        } catch (_) {
+            return false;
+        }
+    };
+
+    const renderPodcasts = () => {
+        if (!tables.podcasts) return;
+        const sorted = [...podcasts].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        tables.podcasts.innerHTML = sorted.map(podcast => `
+            <tr>
+                <td>${escapeHtml(podcast.date || '-')}</td>
+                <td>${podcast.episode ? `#${escapeHtml(podcast.episode)}` : '-'}</td>
+                <td>${escapeHtml(lang === 'eu' ? (podcast.title_eu || podcast.title) : podcast.title)}</td>
+                <td>${podcast.published ? (lang === 'eu' ? 'Argitaratuta' : 'Publicado') : (lang === 'eu' ? 'Zirriborroa' : 'Borrador')}</td>
+                <td><button class="btn btn-primary" onclick="editPodcast('${podcast.id}')">${lang === 'eu' ? 'Editatu' : 'Editar'}</button> <button class="btn btn-danger" onclick="deleteItem('podcasts', '${podcast.id}')">${lang === 'eu' ? 'Ezabatu' : 'Borrar'}</button></td>
+            </tr>
+        `).join('') || `<tr><td colspan="5">${lang === 'eu' ? 'Oraindik ez dago podcastik.' : 'Todavía no hay podcast.'}</td></tr>`;
+    };
+
+    const setFeaturedPodcast = (podcast) => {
+        const audio = document.getElementById('podcast-featured-audio');
+        if (!audio || !podcast) return;
+        const title = lang === 'eu' ? (podcast.title_eu || podcast.title) : podcast.title;
+        const description = lang === 'eu' ? (podcast.description_eu || podcast.description) : podcast.description;
+        const keywords = lang === 'eu' ? (podcast.keywords_eu || podcast.keywords) : podcast.keywords;
+        const cover = safeMediaUrl(podcast.cover);
+        document.getElementById('podcast-featured-title').textContent = title || '';
+        document.getElementById('podcast-featured-description').textContent = description || '';
+        document.getElementById('podcast-featured-keywords').innerHTML = (keywords || '').split(',').filter(Boolean).map(keyword => `<span class="podcast-tag">${escapeHtml(keyword.trim())}</span>`).join('');
+        const coverElement = document.getElementById('podcast-featured-cover');
+        coverElement.style.backgroundImage = cover ? `url("${cover}")` : '';
+        const source = safeMediaUrl(podcast.audio_url);
+        let playbackStatus = document.getElementById('podcast-playback-status');
+        if (!playbackStatus) {
+            playbackStatus = document.createElement('p');
+            playbackStatus.id = 'podcast-playback-status';
+            playbackStatus.setAttribute('role', 'status');
+            audio.after(playbackStatus);
+        }
+        audio.onerror = () => {
+            playbackStatus.textContent = lang === 'eu' ? 'Ezin da audioa erreproduzitu. Saiatu berriro geroago.' : 'No se puede reproducir el audio. Inténtalo de nuevo más tarde.';
+        };
+        if (audio.getAttribute('src') !== source) {
+            playbackStatus.textContent = '';
+            audio.src = source;
+            audio.load();
+        }
+        audio.hidden = false;
+        selectedPodcastId = podcast.id;
+    };
+
+    const renderPodcastPublic = () => {
+        if (!containers.podcasts) return;
+        const today = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(new Date());
+        const available = [...podcasts]
+            .filter(item => item.published && isMp3Url(item.audio_url) && (!item.date || item.date <= today))
+            .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        const query = podcastFilter.trim().toLowerCase();
+        const filtered = available.filter(item => {
+            const haystack = [item.title, item.title_eu, item.description, item.description_eu, item.keywords, item.keywords_eu].filter(Boolean).join(' ').toLowerCase();
+            return !query || haystack.includes(query);
+        });
+
+        containers.podcasts.innerHTML = filtered.map(item => {
+            const title = lang === 'eu' ? (item.title_eu || item.title) : item.title;
+            const description = lang === 'eu' ? (item.description_eu || item.description) : item.description;
+            const cover = safeMediaUrl(item.cover);
+            const dateLabel = item.date ? new Date(`${item.date}T12:00:00`).toLocaleDateString(lang === 'eu' ? 'eu-ES' : 'es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+            return `<article class="podcast-card"><div class="podcast-card-cover" ${cover ? `style="background-image:url('${cover}')"` : ''}>${cover ? '' : '♪'}</div><div class="podcast-card-body"><div class="podcast-card-meta">${item.episode ? `${lang === 'eu' ? 'Atala' : 'Episodio'} ${escapeHtml(item.episode)} · ` : ''}${escapeHtml(dateLabel)}</div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(description)}</p><button class="btn" type="button" onclick="playPodcast('${item.id}')">▶ ${lang === 'eu' ? 'Entzun' : 'Escuchar'}</button></div></article>`;
+        }).join('') || `<p class="podcast-empty">${query ? (lang === 'eu' ? 'Ez da bat datorren atalik aurkitu.' : 'No hay episodios que coincidan con la búsqueda.') : (lang === 'eu' ? 'Laster argitaratuko ditugu lehen podcastak.' : 'Próximamente publicaremos los primeros podcast.')}</p>`;
+
+        const selected = available.find(item => item.id === selectedPodcastId) || available[0];
+        if (selected) setFeaturedPodcast(selected);
+        else {
+            const audio = document.getElementById('podcast-featured-audio');
+            audio.pause();
+            audio.removeAttribute('src');
+            audio.load();
+            audio.hidden = true;
+            selectedPodcastId = null;
+        }
+    };
+
+    window.playPodcast = (id) => {
+        const podcast = podcasts.find(item => item.id === id);
+        if (!podcast) return;
+        setFeaturedPodcast(podcast);
+        document.getElementById('podcast-featured-audio').play().catch(error => {
+            console.warn('No se ha podido reproducir el audio', error);
+        });
+        document.getElementById('podcast-featured')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
     const renderMenuAdmin = () => {
         const menuContainer = document.getElementById('admin-menu-body');
         if (!menuContainer) return;
@@ -280,15 +574,16 @@ document.addEventListener('DOMContentLoaded', () => {
             { key: 'teachers', labelES: 'Profesorado', labelEU: 'Irakasleak' },
             { key: 'exercises', labelES: 'Ejercicios', labelEU: 'Ariketak' },
             { key: 'calendar', labelES: 'Calendario', labelEU: 'Egutegia' },
+            { key: 'podcasts', labelES: 'Podcast', labelEU: 'Podcastak' },
             { key: 'enrollment', labelES: 'Matrícula', labelEU: 'Matrikula' },
             { key: 'contact', labelES: 'Contacto', labelEU: 'Kontaktua' }
         ];
 
         menuContainer.innerHTML = items.map(item => `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 0.5rem; color: white;">
-                <strong style="font-size: 1.1rem;">${lang === 'eu' ? item.labelEU : item.labelES}</strong>
-                <div>
-                    <span style="margin-right: 1rem; opacity: 0.8; font-size: 0.9rem;">
+            <div class="menu-admin-item">
+                <strong>${lang === 'eu' ? item.labelEU : item.labelES}</strong>
+                <div class="menu-admin-controls">
+                    <span class="menu-admin-status">
                         ${menuState[item.key] ? (lang === 'eu' ? 'Ikusgai webgunean' : 'Visible en la web') : (lang === 'eu' ? 'Ezkutatuta' : 'Oculto')}
                     </span>
                     <button class="btn ${menuState[item.key] ? 'btn-danger' : 'btn-success'}" onclick="toggleMenu('${item.key}')">
@@ -299,9 +594,16 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
     };
 
+    // Estado inicial mientras se cargan los archivos JSON.
+    renderMenuAdmin();
+    renderPodcasts();
+    renderPodcastPublic();
+    loadAllContent();
+    document.addEventListener('admin-authenticated', loadAllContent);
+
     // FORM HANDLERS
     if (forms.news) {
-        forms.news.onsubmit = (e) => {
+        forms.news.onsubmit = async (e) => {
             e.preventDefault();
             const id = document.getElementById('news-id').value || 'n' + Date.now();
 
@@ -330,7 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 excerpt_eu: excerptEuVal,
                 on_home: document.getElementById('news-on-home').checked
             };
-            upsert('news', data);
+            if (!await upsert('news', data)) return;
             forms.news.reset();
             if (quillEs) {
                 quillEs.root.innerHTML = '';
@@ -341,7 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (forms.subjects) {
-        forms.subjects.onsubmit = (e) => {
+        forms.subjects.onsubmit = async (e) => {
             e.preventDefault();
             const id = document.getElementById('subject-id').value || 's' + Date.now();
             const data = {
@@ -350,14 +652,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 name_eu: document.getElementById('subject-name-eu').value,
                 teachers: document.getElementById('subject-teachers').value
             };
-            upsert('subjects', data);
+            if (!await upsert('subjects', data)) return;
             forms.subjects.reset();
             document.getElementById('subject-id').value = '';
         }
     }
 
     if (forms.teachers) {
-        forms.teachers.onsubmit = (e) => {
+        forms.teachers.onsubmit = async (e) => {
             e.preventDefault();
             const id = document.getElementById('teacher-id').value || 't' + Date.now();
             const data = {
@@ -368,14 +670,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 tutoring: document.getElementById('teacher-tutoring').value,
                 tutoring_eu: document.getElementById('teacher-tutoring-eu').value
             };
-            upsert('teachers', data);
+            if (!await upsert('teachers', data)) return;
             forms.teachers.reset();
             document.getElementById('teacher-id').value = '';
         }
     }
 
     if (forms.events) {
-        forms.events.onsubmit = (e) => {
+        forms.events.onsubmit = async (e) => {
             e.preventDefault();
             const id = document.getElementById('event-id').value || 'e' + Date.now();
             const data = {
@@ -392,7 +694,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 description: quillEventEs ? quillEventEs.root.innerHTML : '',
                 description_eu: quillEventEu ? quillEventEu.root.innerHTML : ''
             };
-            upsert('events', data);
+            if (!await upsert('events', data)) return;
             forms.events.reset();
             if (quillEventEs) {
                 quillEventEs.root.innerHTML = '';
@@ -402,35 +704,259 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    if (forms.posts) {
+        forms.posts.onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('post-id').value || 'p' + Date.now();
+            const data = {
+                id,
+                title: document.getElementById('post-title').value,
+                title_eu: document.getElementById('post-title-eu').value,
+                summary: document.getElementById('post-summary').value,
+                summary_eu: document.getElementById('post-summary-eu').value,
+                content: quillPostEs ? quillPostEs.root.innerHTML : '',
+                content_eu: quillPostEu ? quillPostEu.root.innerHTML : '',
+                date: document.getElementById('post-date').value,
+                publish_date: document.getElementById('post-publish-date').value || null,
+                img: document.getElementById('post-img').value,
+                published: document.getElementById('post-published').checked
+            };
+            if (!await upsert('posts', data)) return;
+            forms.posts.reset();
+            document.getElementById('post-id').value = '';
+            if (quillPostEs) {
+                quillPostEs.root.innerHTML = '';
+                quillPostEu.root.innerHTML = '';
+            }
+        };
+    }
+
+    if (forms.podcasts) {
+        let uploading = false;
+        const status = document.getElementById('podcast-upload-status');
+        const submit = document.getElementById('submit-podcast-btn');
+        // Covers may also be paths relative to this installation.
+        document.getElementById('podcast-cover').type = 'text';
+        const uploadInputs = [];
+        for (const [kind, targetId, accept] of [
+            ['audio', 'podcast-audio-url', '.mp3,audio/mpeg'],
+            ['cover', 'podcast-cover', 'image/jpeg,image/png,image/webp']
+        ]) {
+            const target = document.getElementById(targetId);
+            if (kind === 'audio') {
+                const help = target.parentElement.querySelector('small');
+                if (help) help.textContent = lang === 'eu' ? 'Igo MP3a hemen edo adierazi zerbitzarian dagoen fitxategiaren bidea.' : 'Sube aquí el MP3 o indica la ruta de un archivo que ya esté en el servidor.';
+            }
+            const label = document.createElement('label');
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = accept;
+            input.id = `podcast-${kind}-file`;
+            label.htmlFor = input.id;
+            label.textContent = kind === 'audio'
+                ? (lang === 'eu' ? 'MP3a igo (100 MB gehienez)' : 'Subir MP3 (máximo 100 MB)')
+                : (lang === 'eu' ? 'Azala igo (JPG, PNG, WebP; 10 MB)' : 'Subir portada (JPG, PNG, WebP; 10 MB)');
+            target.after(label);
+            label.after(input);
+            uploadInputs.push(input);
+            input.addEventListener('change', async () => {
+                const file = input.files[0];
+                if (!file || uploading) return;
+                status.classList.remove('upload-error');
+                if (file.size > (kind === 'audio' ? 100 : 10) * 1024 * 1024) {
+                    status.textContent = lang === 'eu' ? 'Fitxategia handiegia da.' : 'El archivo supera el tamaño máximo.';
+                    status.classList.add('upload-error');
+                    input.value = '';
+                    return;
+                }
+                uploading = true;
+                submit.disabled = true;
+                uploadInputs.forEach(field => { field.disabled = true; });
+                status.textContent = lang === 'eu' ? 'Fitxategia igotzen…' : 'Subiendo archivo…';
+                try {
+                    const body = new FormData();
+                    body.append('kind', kind);
+                    body.append('file', file);
+                    const response = await fetch('api/upload.php', { method: 'POST', credentials: 'same-origin', body });
+                    const payload = await response.json().catch(() => ({}));
+                    if (!response.ok || !payload.ok) throw new Error(payload.error || `HTTP ${response.status}`);
+                    target.value = payload.path;
+                    status.textContent = lang === 'eu' ? 'Fitxategia igo da. Gorde podcasta argitaratzeko.' : 'Archivo subido. Guarda el podcast para publicarlo.';
+                } catch (error) {
+                    status.textContent = (lang === 'eu' ? 'Ezin izan da igo: ' : 'No se ha podido subir: ') + error.message;
+                    status.classList.add('upload-error');
+                } finally {
+                    uploading = false;
+                    submit.disabled = false;
+                    uploadInputs.forEach(field => { field.disabled = false; });
+                    input.value = '';
+                }
+            });
+        }
+        forms.podcasts.addEventListener('reset', event => {
+            if (uploading || submit.disabled) { event.preventDefault(); return; }
+            document.getElementById('podcast-id').value = '';
+            const preview = document.getElementById('podcast-audio-preview');
+            preview.pause();
+            preview.removeAttribute('src');
+            preview.load();
+            preview.hidden = true;
+            status.textContent = '';
+            status.classList.remove('upload-error');
+        });
+        forms.podcasts.onsubmit = async (e) => {
+            e.preventDefault();
+            if (uploading || submit.disabled) return;
+            const id = document.getElementById('podcast-id').value || 'pc' + Date.now();
+            const audioUrl = document.getElementById('podcast-audio-url').value.trim();
+            const status = document.getElementById('podcast-upload-status');
+            status.classList.remove('upload-error');
+
+            if (!isMp3Url(audioUrl)) {
+                status.textContent = lang === 'eu'
+                    ? 'Sartu zerbitzariko MP3 fitxategi baten bide edo URL balioduna.'
+                    : 'Introduce una ruta o URL válida de un fichero MP3 del servidor.';
+                status.classList.add('upload-error');
+                return;
+            }
+
+            const data = {
+                id,
+                title: document.getElementById('podcast-title').value,
+                title_eu: document.getElementById('podcast-title-eu').value,
+                description: document.getElementById('podcast-description').value,
+                description_eu: document.getElementById('podcast-description-eu').value,
+                keywords: document.getElementById('podcast-keywords').value,
+                keywords_eu: document.getElementById('podcast-keywords-eu').value,
+                date: document.getElementById('podcast-date').value,
+                episode: document.getElementById('podcast-episode').value,
+                cover: document.getElementById('podcast-cover').value,
+                audio_url: audioUrl,
+                published: document.getElementById('podcast-published').checked
+            };
+            submit.disabled = true;
+            const saved = await upsert('podcasts', data);
+            submit.disabled = false;
+            if (!saved) {
+                status.textContent = lang === 'eu'
+                    ? 'Ezin izan da podcastaren fitxa JSON fitxategian gorde.'
+                    : 'No se ha podido guardar la ficha del podcast en el archivo JSON.';
+                status.classList.add('upload-error');
+                return;
+            }
+            forms.podcasts.reset();
+            document.getElementById('podcast-id').value = '';
+            const preview = document.getElementById('podcast-audio-preview');
+            preview.pause();
+            preview.removeAttribute('src');
+            preview.hidden = true;
+            status.textContent = lang === 'eu' ? 'Podcasta behar bezala gorde da.' : 'Podcast guardado correctamente.';
+        };
+    }
+
+    window.previewPodcastAudio = () => {
+        const input = document.getElementById('podcast-audio-url');
+        const preview = document.getElementById('podcast-audio-preview');
+        const status = document.getElementById('podcast-upload-status');
+        if (!input || !preview || !status) return;
+        status.classList.remove('upload-error');
+        if (!isMp3Url(input.value)) {
+            status.textContent = lang === 'eu'
+                ? 'Sartu .mp3 amaiera duen bide edo URL balioduna.'
+                : 'Introduce una ruta o URL válida que termine en .mp3.';
+            status.classList.add('upload-error');
+            preview.hidden = true;
+            return;
+        }
+        preview.src = safeMediaUrl(input.value);
+        preview.hidden = false;
+        preview.load();
+        preview.onerror = () => {
+            status.textContent = lang === 'eu' ? 'Ezin da audioa kargatu. Egiaztatu fitxategia eta bidea.' : 'No se puede cargar el audio. Comprueba que el archivo existe y que la ruta es correcta.';
+            status.classList.add('upload-error');
+        };
+        preview.onloadedmetadata = () => {
+            status.textContent = lang === 'eu' ? 'Audioa behar bezala kargatu da.' : 'Audio cargado correctamente.';
+            status.classList.remove('upload-error');
+        };
+        status.textContent = lang === 'eu'
+            ? 'Bidea baliozkoa da. Erabili erreproduzitzailea audioa egiaztatzeko.'
+            : 'La ruta es válida. Usa el reproductor para comprobar el audio.';
+    };
+
     // HELPER FUNCTIONS
-    const upsert = (entity, data) => {
-        let list = (entity === 'news') ? news : (entity === 'subjects') ? subjects : (entity === 'teachers') ? teachers : events;
+    const renderCollection = (collection) => {
+        const renderers = {
+            news: renderNews,
+            subjects: renderSubjects,
+            teachers: renderTeachers,
+            events: () => { renderEvents(); if (containers.calendar) renderCalendar(); },
+            posts: renderPosts,
+            podcasts: () => { renderPodcasts(); renderPodcastPublic(); },
+            menu: () => { renderMenuAdmin(); applyMenuState(); },
+            calendar: () => { if (containers.calendar) renderCalendar(); }
+        };
+        renderers[collection]?.();
+    };
+
+    const collectionData = (collection) => ({
+        news,
+        subjects,
+        teachers,
+        events,
+        posts,
+        podcasts,
+        menu: menuState,
+        calendar: { nonTeachingDays }
+    })[collection];
+
+    const saveAndRender = async (collection) => {
+        renderCollection(collection);
+        try {
+            await persistCollection(collection, collectionData(collection));
+            showAdminNotice(lang === 'eu' ? 'Aldaketak gorde dira.' : 'Cambios guardados correctamente.');
+            return true;
+        } catch (error) {
+            console.error(`No se ha podido guardar ${collection}`, error);
+            const authMessage = error.message === 'content_changed_reload'
+                ? (lang === 'eu' ? 'Beste saio batek datuak aldatu ditu. Kopiatu aldaketak eta kargatu berriro orria.' : 'Otra sesión ha modificado los datos. Copia tus cambios y recarga la página antes de guardar.')
+                : error.message === 'authentication_required'
+                ? (lang === 'eu' ? 'Saioa iraungi da. Sartu berriro.' : 'La sesión ha caducado. Vuelve a iniciar sesión.')
+                : (lang === 'eu' ? 'Ezin izan dira aldaketak JSON fitxategian gorde.' : 'No se han podido guardar los cambios en el archivo JSON.');
+            showAdminNotice(authMessage, true);
+            return false;
+        }
+    };
+
+    const upsert = async (entity, data) => {
+        const lists = { news, subjects, teachers, events, posts, podcasts };
+        const list = lists[entity];
+        if (!list) return false;
+        const previous = [...list];
         const idx = list.findIndex(item => item.id === data.id);
         if (idx > -1) list[idx] = data;
         else list.unshift(data);
-        saveAndRender();
+        const saved = await saveAndRender(entity);
+        if (!saved) {
+            list.splice(0, list.length, ...previous);
+            renderCollection(entity);
+        }
+        return saved;
     };
 
-    const saveAndRender = () => {
-        firebase.database().ref('musika_news').set(news);
-        firebase.database().ref('musika_subjects').set(subjects);
-        firebase.database().ref('musika_teachers').set(teachers);
-        firebase.database().ref('musika_events').set(events);
-    };
-
-    window.saveCalendarConfig = () => {
-        firebase.database().ref('musika_calendar_config').set({ nonTeachingDays });
+    window.saveCalendarConfig = async () => {
+        return saveAndRender('calendar');
     };
 
     window.toggleNewsHome = (id) => {
         const item = news.find(n => n.id === id);
         if (item) item.on_home = !item.on_home;
-        saveAndRender();
+        saveAndRender('news');
     };
 
     window.toggleMenu = (key) => {
         menuState[key] = !menuState[key];
-        firebase.database().ref('musika_menu').set(menuState);
+        saveAndRender('menu');
     };
 
     window.deleteItem = (entity, id) => {
@@ -450,13 +976,20 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.appendChild(box);
         document.body.appendChild(overlay);
 
-        document.getElementById('modal-confirm-btn').onclick = () => {
+        document.getElementById('modal-confirm-btn').onclick = async () => {
             document.body.removeChild(overlay);
+            const previousPodcasts = [...podcasts];
             if (entity === 'news') news = news.filter(n => n && n.id !== id);
             if (entity === 'subjects') subjects = subjects.filter(s => s && s.id !== id);
             if (entity === 'teachers') teachers = teachers.filter(t => t && t.id !== id);
             if (entity === 'events') events = events.filter(e => e && e.id !== id);
-            saveAndRender();
+            if (entity === 'posts') posts = posts.filter(p => p && p.id !== id);
+            if (entity === 'podcasts') podcasts = podcasts.filter(p => p && p.id !== id);
+            const saved = await saveAndRender(entity);
+            if (!saved && entity === 'podcasts') {
+                podcasts = previousPodcasts;
+                renderPodcasts();
+            }
         };
 
         document.getElementById('modal-cancel-btn').onclick = () => {
@@ -584,6 +1117,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    window.editPost = (id) => {
+        const item = posts.find(post => post.id === id);
+        if (!item) return;
+        document.getElementById('post-id').value = item.id;
+        document.getElementById('post-title').value = item.title || '';
+        document.getElementById('post-title-eu').value = item.title_eu || '';
+        document.getElementById('post-summary').value = item.summary || '';
+        document.getElementById('post-summary-eu').value = item.summary_eu || '';
+        document.getElementById('post-date').value = item.date || '';
+        document.getElementById('post-publish-date').value = item.publish_date || '';
+        document.getElementById('post-img').value = item.img || '';
+        document.getElementById('post-published').checked = item.published !== false;
+        if (quillPostEs) {
+            quillPostEs.root.innerHTML = item.content || '';
+            quillPostEu.root.innerHTML = item.content_eu || '';
+        }
+        document.getElementById('section-posts')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    window.editPodcast = (id) => {
+        const item = podcasts.find(podcast => podcast.id === id);
+        if (!item) return;
+        document.getElementById('podcast-id').value = item.id;
+        document.getElementById('podcast-title').value = item.title || '';
+        document.getElementById('podcast-title-eu').value = item.title_eu || '';
+        document.getElementById('podcast-description').value = item.description || '';
+        document.getElementById('podcast-description-eu').value = item.description_eu || '';
+        document.getElementById('podcast-keywords').value = item.keywords || '';
+        document.getElementById('podcast-keywords-eu').value = item.keywords_eu || '';
+        document.getElementById('podcast-date').value = item.date || '';
+        document.getElementById('podcast-episode').value = item.episode || '';
+        document.getElementById('podcast-cover').value = item.cover || '';
+        document.getElementById('podcast-audio-url').value = item.audio_url || '';
+        document.getElementById('podcast-published').checked = item.published !== false;
+        const preview = document.getElementById('podcast-audio-preview');
+        const previewUrl = safeMediaUrl(item.audio_url);
+        if (preview && previewUrl) {
+            preview.src = previewUrl;
+            preview.hidden = false;
+            preview.load();
+        }
+        document.getElementById('section-podcasts')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
     window.duplicateNews = (id) => {
         const item = news.find(n => n.id === id);
         if (item) {
@@ -592,7 +1169,7 @@ document.addEventListener('DOMContentLoaded', () => {
             newItem.title += ' (COPIA)';
             newItem.on_home = false;
             news.unshift(newItem);
-            saveAndRender();
+            saveAndRender('news');
         }
     };
 
@@ -603,7 +1180,7 @@ document.addEventListener('DOMContentLoaded', () => {
             newItem.id = 'e' + Date.now();
             newItem.title += ' (COPIA)';
             events.unshift(newItem);
-            saveAndRender();
+            saveAndRender('events');
         }
     };
 
@@ -645,11 +1222,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const newsId = urlParams.get('id');
     const newsDetailContainer = document.getElementById('news-detail-container');
-    if (newsDetailContainer && newsId) {
-        db.ref('musika_news').on('value', (snapshot) => {
-            let val = snapshot.val();
-            let allNews = val ? (Array.isArray(val) ? val : Object.values(val)).filter(Boolean) : [];
-            const item = allNews.find(n => n.id === newsId);
+    function renderNewsDetail() {
+        if (newsDetailContainer && newsId) {
+            const item = news.find(n => n.id === newsId);
             if (item) {
                 const title = lang === 'eu' ? (item.title_eu || item.title) : item.title;
                 const summary = lang === 'eu' ? (item.summary_eu || item.summary) : item.summary;
@@ -677,7 +1252,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 newsDetailContainer.innerHTML = `<h2 style="text-align:center; color:white;">${lang === 'eu' ? 'Notizia ez da aurkitu' : 'Noticia no encontrada'}</h2>`;
             }
-        });
+        }
     }
 
     // CALENDAR LOGIC

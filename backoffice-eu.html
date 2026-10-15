@@ -17,7 +17,7 @@
     </style>
 </head>
 
-<body style="background: #5eabdc;">
+<body class="admin-page">
 
     <!-- Login Overlay -->
     <div id="login-overlay"
@@ -26,12 +26,11 @@
             style="background: white; padding: 3rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: center; max-width: 400px; width: 90%;">
             <h2 style="color: #5eabdc; margin-bottom: 1.5rem; font-family: 'Inter', sans-serif;">Sarbide Mugatua</h2>
             <input type="password" id="login-password" placeholder="Sarbide-gakoa"
-                style="width: 100%; padding: 1rem; border: 2px solid #e0e0e0; border-radius: 10px; margin-bottom: 1.5rem; font-size: 1rem; font-family: 'Inter', sans-serif; box-sizing: border-box;">
-            <button onclick="checkPassword()" class="btn btn-primary"
+                autocomplete="current-password" style="width: 100%; padding: 1rem; border: 2px solid #e0e0e0; border-radius: 10px; margin-bottom: 1.5rem; font-size: 1rem; font-family: 'Inter', sans-serif; box-sizing: border-box;">
+            <button id="login-submit" onclick="checkPassword()" class="btn btn-primary"
                 style="width: 100%; padding: 1rem; font-size: 1.1rem; border: none; cursor: pointer;">Sartu</button>
             <p id="login-error"
-                style="color: #e74c3c; margin-top: 1rem; display: none; font-size: 0.9rem; font-weight: 600;">Gako
-                okerra</p>
+                style="color: #e74c3c; margin-top: 1rem; display: none; font-size: 0.9rem; font-weight: 600;">Ezin izan da saioa hasi.</p>
             <div style="margin-top: 1.5rem;">
                 <a href="index-eu.html" style="color: #7f8c8d; text-decoration: none; font-size: 0.9rem;">Webgunera
                     itzuli</a>
@@ -39,12 +38,33 @@
         </div>
     </div>
     <script>
-        function checkPassword() {
-            if (document.getElementById('login-password').value === "erandio2026") {
+        async function checkPassword() {
+            const error = document.getElementById('login-error');
+            const button = document.getElementById('login-submit');
+            error.style.display = 'none';
+            button.disabled = true;
+            try {
+                const response = await fetch('api/content.php?action=login', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: document.getElementById('login-password').value })
+                });
+                if (!response.ok) throw new Error('login_failed');
                 document.getElementById('login-overlay').style.display = 'none';
-            } else {
-                document.getElementById('login-error').style.display = 'block';
+                document.getElementById('login-password').value = '';
+                document.dispatchEvent(new Event('admin-authenticated'));
+            } catch (_) {
+                error.textContent = 'Gakoa ez da zuzena edo PHP zerbitzaria ez dago erabilgarri.';
+                error.style.display = 'block';
+            } finally {
+                button.disabled = false;
             }
+        }
+        async function logoutBackoffice() {
+            await fetch('api/content.php?action=logout', { method: 'POST', credentials: 'same-origin' });
+            document.getElementById('login-overlay').style.display = 'flex';
+            document.getElementById('login-password').focus();
         }
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('login-password').addEventListener('keypress', function (e) {
@@ -52,6 +72,12 @@
                     checkPassword();
                 }
             });
+            fetch('api/content.php?action=status', { credentials: 'same-origin', cache: 'no-store' })
+                .then(response => response.ok ? response.json() : null)
+                .then(data => {
+                    if (data?.authenticated) document.getElementById('login-overlay').style.display = 'none';
+                })
+                .catch(() => {});
             document.getElementById('login-password').focus();
         });
     </script>
@@ -64,17 +90,20 @@
                 <span style="color:white;">|</span>
                 <a href="backoffice-eu.html" class="active" style="color:white; font-weight:bold;">EU</a>
             </div>
+            <button type="button" class="btn" onclick="logoutBackoffice()">Saioa itxi</button>
             <a href="index-eu.html" class="btn btn-primary">Webgunera itzuli</a>
         </div>
     </div>
 
     <main>
         <div class="admin-tabs">
-            <button class="tab-btn active" onclick="showSection('news')">Albisteak</button>
-            <button class="tab-btn" onclick="showSection('subjects')">Ikasgaiak</button>
-            <button class="tab-btn" onclick="showSection('teachers')">Irakasleak</button>
-            <button class="tab-btn" onclick="showSection('events')">Ekitaldiak</button>
-            <button class="tab-btn" onclick="showSection('menu')">Menua</button>
+            <button class="tab-btn active" onclick="showSection('news', this)">Albisteak</button>
+            <button class="tab-btn" onclick="showSection('subjects', this)">Ikasgaiak</button>
+            <button class="tab-btn" onclick="showSection('teachers', this)">Irakasleak</button>
+            <button class="tab-btn" onclick="showSection('events', this)">Ekitaldiak</button>
+            <button class="tab-btn" onclick="showSection('posts', this)">Sarrerak</button>
+            <button class="tab-btn" onclick="showSection('podcasts', this)">Podcastak</button>
+            <button class="tab-btn" onclick="showSection('menu', this)">Menua</button>
         </div>
 
         <!-- ALBISTEAK -->
@@ -83,68 +112,12 @@
                 <h3>Albistea Argitaratu / Editatu</h3>
                 <form id="news-form" style="margin-top: 1.5rem;">
                     <input type="hidden" id="news-id">
-                    <div class="news-form-grid">
-                        <div class="form-group">
-                            <label for="news-title">Izenburua (ES)</label>
-                            <input type="text" id="news-title" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="news-title-eu">Izenburua (EU)</label>
-                            <input type="text" id="news-title-eu" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="news-date">Ikus-data (ES/EU)</label>
-                            <input type="date" id="news-date" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="news-publish-date">Argitaratze-data (Automatikoa)</label>
-                            <input type="date" id="news-publish-date">
-                        </div>
-                        <div class="form-group">
-                            <label for="news-expiry-date">Iraungitze-data (Desagertu)</label>
-                            <input type="date" id="news-expiry-date">
-                        </div>
-                        <div class="form-group">
-                            <label for="news-img-file">Imagen Principal / Irudi Nagusia</label>
-                            <input type="file" id="news-img-file" accept="image/*" style="background: rgba(255,255,255,0.1); padding: 0.5rem; color: white; width: 100%; border-radius: 6px; margin-bottom: 0.5rem;">
-                            <input type="hidden" id="news-img">
-                            <div id="news-img-preview" style="height: 100px; width: 100%; background-size: contain; background-position: left center; background-repeat: no-repeat; display: none;"></div>
-                        </div>
-                        <div class="form-group full-width">
-                            <div
-                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                <label style="margin: 0;">Laburpena (ES)</label>
-                                <button type="button" onclick="toggleHtml('es')" class="btn"
-                                    style="background: #333; color: white; padding: 0.3rem 0.6rem; font-size: 0.8rem; border-radius: 4px;">&lt;&gt;
-                                    Kodea Editatu</button>
-                            </div>
-                            <div id="editor-es" style="height: 150px; background: white; color: black;"></div>
-                            
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="news-summary" style="display:block; margin-bottom:0.5rem; color:white;">Entradilla / Resumen Breve (ES)</label>
-                            <textarea id="news-summary" rows="3" style="width: 100%; padding: 0.8rem; border-radius: 6px; border: none; margin-bottom: 1rem;" required></textarea>
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="news-summary-eu" style="display:block; margin-bottom:0.5rem; color:white;">Sarrera / Laburpen Laburra (EU)</label>
-                            <textarea id="news-summary-eu" rows="3" style="width: 100%; padding: 0.8rem; border-radius: 6px; border: none; margin-bottom: 1rem;" required></textarea>
-                        </div>
-                        <div class="form-group full-width">
-                            <div
-                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                <label style="margin: 0;">Noticia Completa / Eduki Osoa (ES)</label>
-                                <button type="button" onclick="toggleHtml('eu')" class="btn"
-                                    style="background: #333; color: white; padding: 0.3rem 0.6rem; font-size: 0.8rem; border-radius: 4px;">&lt;&gt;
-                                    Kodea Editatu</button>
-                            </div>
-                            <div id="editor-eu" style="height: 150px; background: white; color: black;"></div>
-                            
-                        </div>
-                        <div class="form-group">
-                            <input type="checkbox" id="news-on-home" checked>
-                            <label for="news-on-home" style="display:inline">Hasieran erakutsi</label>
-                        </div>
+                    <div class="bilingual-grid">
+                        <section class="language-panel"><h4>Euskera</h4><div class="form-group"><label for="news-title-eu">Izenburua</label><input type="text" id="news-title-eu" required></div><div class="form-group"><label for="news-summary-eu">Sarrera / laburpena</label><textarea id="news-summary-eu" rows="3" required></textarea></div><div class="form-group"><div class="field-heading"><label>Eduki osoa</label><button type="button" onclick="toggleHtml('eu')" class="btn btn-small">&lt;&gt; HTML</button></div><div id="editor-eu" class="rich-editor"></div></div></section>
+                        <section class="language-panel"><h4>Castellano</h4><div class="form-group"><label for="news-title">Título</label><input type="text" id="news-title" required></div><div class="form-group"><label for="news-summary">Entradilla / resumen</label><textarea id="news-summary" rows="3" required></textarea></div><div class="form-group"><div class="field-heading"><label>Contenido completo</label><button type="button" onclick="toggleHtml('es')" class="btn btn-small">&lt;&gt; HTML</button></div><div id="editor-es" class="rich-editor"></div></div></section>
                     </div>
+                    <div class="translation-actions"><button type="button" class="btn" onclick="translateSection('news', 'eu', 'es', this)">EU → ES itzuli</button><button type="button" class="btn" onclick="translateSection('news', 'es', 'eu', this)">ES → EU itzuli</button></div>
+                    <div class="shared-fields-grid"><div class="form-group"><label for="news-date">Ikus-data</label><input type="date" id="news-date" required></div><div class="form-group"><label for="news-publish-date">Argitaratze-data</label><input type="date" id="news-publish-date"></div><div class="form-group"><label for="news-expiry-date">Iraungitze-data</label><input type="date" id="news-expiry-date"></div><div class="form-group"><label for="news-img-file">Irudi nagusia</label><input type="file" id="news-img-file" accept="image/*"><input type="hidden" id="news-img"><div id="news-img-preview" class="image-preview"></div></div><div class="form-group checkbox-field"><input type="checkbox" id="news-on-home" checked><label for="news-on-home">Hasieran erakutsi</label></div></div>
                     <div style="margin-top: 1rem; display: flex; gap: 1rem;">
                         <button type="submit" id="submit-news-btn" class="btn btn-success">Albistea Gorde</button>
                         <button type="reset" class="btn btn-danger">Utzi</button>
@@ -173,21 +146,9 @@
                 <h3>Ikasgaia Gehitu / Editatu</h3>
                 <form id="subjects-form" style="margin-top: 1.5rem;">
                     <input type="hidden" id="subject-id">
-                    <div class="news-form-grid">
-                        <div class="form-group">
-                            <label for="subject-name">Izena (ES)</label>
-                            <input type="text" id="subject-name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="subject-name-eu">Izena (EU)</label>
-                            <input type="text" id="subject-name-eu" required>
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="subject-teachers">Irakasleak (Izenak komaz bereizita)</label>
-                            <input type="text" id="subject-teachers"
-                                placeholder="Adibidez: Iñaki Allende, Yolanda Sierra">
-                        </div>
-                    </div>
+                    <div class="bilingual-grid compact"><section class="language-panel"><h4>Euskera</h4><div class="form-group"><label for="subject-name-eu">Izena</label><input type="text" id="subject-name-eu" required></div></section><section class="language-panel"><h4>Castellano</h4><div class="form-group"><label for="subject-name">Nombre</label><input type="text" id="subject-name" required></div></section></div>
+                    <div class="translation-actions"><button type="button" class="btn" onclick="translateSection('subjects', 'eu', 'es', this)">EU → ES itzuli</button><button type="button" class="btn" onclick="translateSection('subjects', 'es', 'eu', this)">ES → EU itzuli</button></div>
+                    <div class="shared-fields-grid"><div class="form-group full-width"><label for="subject-teachers">Irakasleak (izenak komaz bereizita)</label><input type="text" id="subject-teachers" placeholder="Adib.: Iñaki Allende, Yolanda Sierra"></div></div>
                     <div style="margin-top: 1rem; display: flex; gap: 1rem;">
                         <button type="submit" id="submit-subject-btn" class="btn btn-success">Ikasgaia Gorde</button>
                         <button type="reset" class="btn btn-danger">Utzi</button>
@@ -215,29 +176,9 @@
                 <h3>Irakaslea Gehitu / Editatu</h3>
                 <form id="teachers-form" style="margin-top: 1.5rem;">
                     <input type="hidden" id="teacher-id">
-                    <div class="news-form-grid">
-                        <div class="form-group">
-                            <label for="teacher-name">Izena</label>
-                            <input type="text" id="teacher-name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="teacher-instrument">Materia / Instrumentua (ES)</label>
-                            <input type="text" id="teacher-instrument" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="teacher-instrument-eu">Materia / Instrumentua (EU)</label>
-                            <input type="text" id="teacher-instrument-eu" required>
-                        </div>
-                        <div class="form-group full-width">
-                            <label>Tutoretzak (ES)</label>
-                            <textarea id="teacher-tutoring" placeholder="Lunes: 18:30-18:45 - Astrabudua"></textarea>
-                        </div>
-                        <div class="form-group full-width">
-                            <label>Tutoretzak (EU)</label>
-                            <textarea id="teacher-tutoring-eu"
-                                placeholder="Astelehena: 18:30-18:45 - Astrabudua"></textarea>
-                        </div>
-                    </div>
+                    <div class="shared-fields-grid"><div class="form-group full-width"><label for="teacher-name">Izen-abizenak</label><input type="text" id="teacher-name" required></div></div>
+                    <div class="bilingual-grid"><section class="language-panel"><h4>Euskera</h4><div class="form-group"><label for="teacher-instrument-eu">Instrumentua / ikasgaia</label><input type="text" id="teacher-instrument-eu" required></div><div class="form-group"><label for="teacher-tutoring-eu">Tutoretzak</label><textarea id="teacher-tutoring-eu" placeholder="Astelehena: 18:30-18:45 - Astrabudua"></textarea></div></section><section class="language-panel"><h4>Castellano</h4><div class="form-group"><label for="teacher-instrument">Instrumento / asignatura</label><input type="text" id="teacher-instrument" required></div><div class="form-group"><label for="teacher-tutoring">Tutorías</label><textarea id="teacher-tutoring" placeholder="Lunes: 18:30-18:45 - Astrabudua"></textarea></div></section></div>
+                    <div class="translation-actions"><button type="button" class="btn" onclick="translateSection('teachers', 'eu', 'es', this)">EU → ES itzuli</button><button type="button" class="btn" onclick="translateSection('teachers', 'es', 'eu', this)">ES → EU itzuli</button></div>
                     <div style="margin-top: 1rem; display: flex; gap: 1rem;">
                         <button type="submit" id="submit-teacher-btn" class="btn btn-success">Irakaslea Gorde</button>
                         <button type="reset" class="btn btn-danger">Utzi</button>
@@ -273,52 +214,9 @@
                 <h3>Ekitaldia Sortu / Editatu</h3>
                 <form id="events-form" style="margin-top: 1.5rem;">
                     <input type="hidden" id="event-id">
-                    <div class="news-form-grid">
-                        <div class="form-group">
-                            <label for="event-title">Ekitaldiaren Izenburua (ES)</label>
-                            <input type="text" id="event-title" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="event-title-eu">Ekitaldiaren Izenburua (EU)</label>
-                            <input type="text" id="event-title-eu" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="event-type">Ekitaldi Mota (ES)</label>
-                            <input type="text" id="event-type" placeholder="Adib: Concierto, Audición, Taller..." required>
-                        </div>
-                        <div class="form-group">
-                            <label for="event-type-eu">Ekitaldi Mota (EU)</label>
-                            <input type="text" id="event-type-eu" placeholder="Adib: Kontzertua, Entzunaldia..." required>
-                        </div>
-                        <div class="form-group">
-                            <label for="event-date">Ekitaldiaren Eguna / Data</label>
-                            <input type="date" id="event-date" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="event-time">Ekitaldiaren Ordua</label>
-                            <input type="time" id="event-time" required>
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="event-img">Ekitaldiaren Irudia (URL)</label>
-                            <input type="text" id="event-img" placeholder="https://ejemplo.com/imagen.jpg">
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="event-summary">Sarrera (ES)</label>
-                            <textarea id="event-summary" rows="2"></textarea>
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="event-summary-eu">Sarrera (EU)</label>
-                            <textarea id="event-summary-eu" rows="2"></textarea>
-                        </div>
-                        <div class="form-group full-width">
-                            <label>Deskribapen Zehatza (ES)</label>
-                            <div id="event-editor-es" style="height: 150px; background: white; color: black;"></div>
-                        </div>
-                        <div class="form-group full-width">
-                            <label>Deskribapen Zehatza (EU)</label>
-                            <div id="event-editor-eu" style="height: 150px; background: white; color: black;"></div>
-                        </div>
-                    </div>
+                    <div class="bilingual-grid"><section class="language-panel"><h4>Euskera</h4><div class="form-group"><label for="event-title-eu">Ekitaldiaren izenburua</label><input type="text" id="event-title-eu" required></div><div class="form-group"><label for="event-type-eu">Ekitaldi mota</label><input type="text" id="event-type-eu" placeholder="Adib.: Kontzertua, Entzunaldia..." required></div><div class="form-group"><label for="event-summary-eu">Sarrera</label><textarea id="event-summary-eu" rows="2"></textarea></div><div class="form-group"><label>Deskribapen zehatza</label><div id="event-editor-eu" class="rich-editor"></div></div></section><section class="language-panel"><h4>Castellano</h4><div class="form-group"><label for="event-title">Título del evento</label><input type="text" id="event-title" required></div><div class="form-group"><label for="event-type">Tipo de evento</label><input type="text" id="event-type" placeholder="Ej.: Concierto, Audición, Taller..." required></div><div class="form-group"><label for="event-summary">Entradilla</label><textarea id="event-summary" rows="2"></textarea></div><div class="form-group"><label>Descripción detallada</label><div id="event-editor-es" class="rich-editor"></div></div></section></div>
+                    <div class="translation-actions"><button type="button" class="btn" onclick="translateSection('events', 'eu', 'es', this)">EU → ES itzuli</button><button type="button" class="btn" onclick="translateSection('events', 'es', 'eu', this)">ES → EU itzuli</button></div>
+                    <div class="shared-fields-grid"><div class="form-group"><label for="event-date">Ekitaldiaren eguna</label><input type="date" id="event-date" required></div><div class="form-group"><label for="event-time">Ekitaldiaren ordua</label><input type="time" id="event-time" required></div><div class="form-group full-width"><label for="event-img">Ekitaldiaren irudia (URL)</label><input type="url" id="event-img" placeholder="https://adibidea.eus/irudia.jpg"></div></div>
                     <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
                         <button type="submit" class="btn btn-success">Ekitaldia Gorde</button>
                         <button type="reset" class="btn btn-danger">Utzi</button>
@@ -342,6 +240,42 @@
             </div>
         </div>
 
+        <!-- BLOGEKO SARRERAK -->
+        <div id="section-posts" class="admin-section">
+            <div class="admin-card">
+                <h3>Sarrera Argitaratu / Editatu</h3>
+                <form id="posts-form" style="margin-top: 1.5rem;">
+                    <input type="hidden" id="post-id">
+                    <div class="bilingual-grid">
+                        <section class="language-panel"><h4>Euskera</h4><div class="form-group"><label for="post-title-eu">Izenburua</label><input type="text" id="post-title-eu" required></div><div class="form-group"><label for="post-summary-eu">Laburpena</label><textarea id="post-summary-eu" rows="3" required></textarea></div><div class="form-group"><label>Eduki osoa</label><div id="post-editor-eu" class="rich-editor"></div></div></section>
+                        <section class="language-panel"><h4>Castellano</h4><div class="form-group"><label for="post-title">Título</label><input type="text" id="post-title" required></div><div class="form-group"><label for="post-summary">Resumen</label><textarea id="post-summary" rows="3" required></textarea></div><div class="form-group"><label>Contenido completo</label><div id="post-editor-es" class="rich-editor"></div></div></section>
+                    </div>
+                    <div class="translation-actions"><button type="button" class="btn" onclick="translateSection('posts', 'eu', 'es', this)">EU → ES itzuli</button><button type="button" class="btn" onclick="translateSection('posts', 'es', 'eu', this)">ES → EU itzuli</button></div>
+                    <div class="shared-fields-grid"><div class="form-group"><label for="post-date">Data</label><input type="date" id="post-date" required></div><div class="form-group"><label for="post-publish-date">Noiztik argitaratu</label><input type="date" id="post-publish-date"></div><div class="form-group full-width"><label for="post-img">Irudi nagusia (URL)</label><input type="url" id="post-img" placeholder="https://adibidea.eus/irudia.jpg"></div><div class="form-group checkbox-field"><input type="checkbox" id="post-published" checked><label for="post-published">Sarrera argitaratuta</label></div></div>
+                    <div class="form-actions"><button type="submit" class="btn btn-success">Sarrera Gorde</button><button type="reset" class="btn btn-danger">Utzi</button></div>
+                </form>
+            </div>
+            <div class="admin-card"><h3>Blogeko Sarrerak</h3><div class="table-scroll"><table class="admin-table"><thead><tr><th>Data</th><th>Izenburua</th><th>Egoera</th><th>Ekintzak</th></tr></thead><tbody id="admin-posts-body"></tbody></table></div></div>
+        </div>
+
+        <!-- PODCASTAK -->
+        <div id="section-podcasts" class="admin-section">
+            <div class="admin-card">
+                <h3>Podcasta Argitaratu / Editatu</h3>
+                <form id="podcasts-form" style="margin-top: 1.5rem;">
+                    <input type="hidden" id="podcast-id">
+                    <div class="bilingual-grid">
+                        <section class="language-panel"><h4>Euskera</h4><div class="form-group"><label for="podcast-title-eu">Izenburua</label><input type="text" id="podcast-title-eu" required></div><div class="form-group"><label for="podcast-description-eu">Deskribapena</label><textarea id="podcast-description-eu" rows="5" required></textarea></div><div class="form-group"><label for="podcast-keywords-eu">Gako-hitzak</label><input type="text" id="podcast-keywords-eu" placeholder="musika, elkarrizketa, pianoa"></div></section>
+                        <section class="language-panel"><h4>Castellano</h4><div class="form-group"><label for="podcast-title">Título</label><input type="text" id="podcast-title" required></div><div class="form-group"><label for="podcast-description">Descripción</label><textarea id="podcast-description" rows="5" required></textarea></div><div class="form-group"><label for="podcast-keywords">Palabras clave</label><input type="text" id="podcast-keywords" placeholder="música, entrevista, piano"></div></section>
+                    </div>
+                    <div class="translation-actions"><button type="button" class="btn" onclick="translateSection('podcasts', 'eu', 'es', this)">EU → ES itzuli</button><button type="button" class="btn" onclick="translateSection('podcasts', 'es', 'eu', this)">ES → EU itzuli</button></div>
+                    <div class="shared-fields-grid"><div class="form-group"><label for="podcast-date">Argitaratze-data</label><input type="date" id="podcast-date" required></div><div class="form-group"><label for="podcast-episode">Atalaren zenbakia</label><input type="number" id="podcast-episode" min="1" step="1" placeholder="1"></div><div class="form-group full-width"><label for="podcast-cover">Azala (URL)</label><input type="url" id="podcast-cover" placeholder="https://adibidea.eus/azala.jpg"></div><div class="form-group full-width upload-field"><label for="podcast-audio-url">MP3aren URLa edo bidea</label><input type="text" id="podcast-audio-url" required placeholder="audio/podcasts/atala-01.mp3"><small>Igo fitxategia zerbitzarira FileZilla bidez, eta itsatsi hemen bide erlatiboa edo URL osoa.</small><div class="audio-preview-row"><button type="button" class="btn" onclick="previewPodcastAudio()">Audioa probatu</button><audio id="podcast-audio-preview" controls preload="metadata" hidden></audio></div><span id="podcast-upload-status" role="status" aria-live="polite"></span></div><div class="form-group checkbox-field"><input type="checkbox" id="podcast-published" checked><label for="podcast-published">Podcasten orrian ikusgai</label></div></div>
+                    <div class="form-actions"><button type="submit" id="submit-podcast-btn" class="btn btn-success">Podcasta Gorde</button><button type="reset" class="btn btn-danger">Utzi</button></div>
+                </form>
+            </div>
+            <div class="admin-card"><h3>Argitaratutako podcastak</h3><div class="table-scroll"><table class="admin-table"><thead><tr><th>Data</th><th>Atala</th><th>Izenburua</th><th>Egoera</th><th>Ekintzak</th></tr></thead><tbody id="admin-podcasts-body"></tbody></table></div></div>
+        </div>
+
         <!-- MENUA -->
         <div id="section-menu" class="admin-section">
             <div class="admin-card">
@@ -357,15 +291,13 @@
     </main>
 
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <script src="script.js"></script>
     <script>
-        function showSection(name) {
+        function showSection(name, button) {
             document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('section-' + name).classList.add('active');
-            event.currentTarget.classList.add('active');
+            button.classList.add('active');
         }
     </script>
 </body>
